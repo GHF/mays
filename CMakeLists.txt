@@ -8,6 +8,10 @@ endif()
 
 project(mays LANGUAGES CXX)
 
+add_library(${PROJECT_NAME} INTERFACE)
+target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
+
 # Build unit tests when built standalone
 if(TOP_LEVEL_PROJECT)
   include(FetchContent)
@@ -24,6 +28,7 @@ if(TOP_LEVEL_PROJECT)
   )
   target_link_libraries(${TEST_NAME}
     PRIVATE
+      mays
       Catch2::Catch2
   )
 
@@ -31,3 +36,5 @@ if(TOP_LEVEL_PROJECT)
   include(Catch)
   catch_discover_tests(${TEST_NAME})
 endif(TOP_LEVEL_PROJECT)
+
+add_subdirectory(mays/internal)
