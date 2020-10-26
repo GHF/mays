@@ -3,3 +3,4 @@ build/
 Thumbs.db
 *.swp
 *.swo
+compile_commands.json

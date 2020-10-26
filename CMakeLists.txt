@@ -22,6 +22,7 @@ if(TOP_LEVEL_PROJECT)
   FetchContent_MakeAvailable(Catch2)
   list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/contrib)
 
+  set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
   set(TEST_NAME ${PROJECT_NAME}_tests)
   add_executable(${TEST_NAME}
     catch2_main.cc
