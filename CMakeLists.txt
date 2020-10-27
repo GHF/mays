@@ -32,6 +32,10 @@ if(TOP_LEVEL_PROJECT)
       mays
       Catch2::Catch2
   )
+  target_compile_options(${PROJECT_NAME}_tests
+    PRIVATE
+      $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Werror;-Wconversion;-Wall;-Wextra;-pedantic;>
+  )
 
   enable_testing()
   include(Catch)
