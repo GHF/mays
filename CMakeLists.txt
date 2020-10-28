@@ -42,4 +42,4 @@ if(TOP_LEVEL_PROJECT)
   catch_discover_tests(${TEST_NAME})
 endif(TOP_LEVEL_PROJECT)
 
-add_subdirectory(mays/internal)
+add_subdirectory(mays)
