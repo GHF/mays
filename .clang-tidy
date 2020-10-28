@@ -1,0 +1,19 @@
+---
+Checks: >
+  -*,
+  bugprone-*,
+  cppcoreguidelines-*,
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  cert-*,
+  google-*,
+  -google-build-using-namespace,
+  llvm-*,
+  -llvm-header-guard,
+  misc-*,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  performance-*,
+  readability-*,
+  -readability-named-parameter,
+FormatStyle:     file
