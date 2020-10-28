@@ -2,6 +2,7 @@
 # http://clang.llvm.org/docs/ClangFormatStyleOptions.html
 BasedOnStyle: Chromium
 ColumnLimit: 100
+Standard: c++20
 IncludeBlocks: Regroup
 IncludeCategories:
   # One word C headers
