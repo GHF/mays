@@ -34,7 +34,11 @@ if(TOP_LEVEL_PROJECT)
   )
   target_compile_options(${PROJECT_NAME}_tests
     PRIVATE
+      # Lots of warnings that are each fatal
       $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Werror;-Wconversion;-Wall;-Wextra;-pedantic;>
+      # Force color diagnostics output
+      $<$<CXX_COMPILER_ID:GNU>:-fdiagnostics-color=always>
+      $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-fcolor-diagnostics>
   )
 
   enable_testing()
