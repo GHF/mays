@@ -43,7 +43,7 @@ constexpr T Average(T a, T b) {
   // Use a more compiler-friendly form for unsigned integers, where the absolute difference of a and
   // b will always be in range.
   if (a > b) {
-    ::mays::internal::swap(a, b);
+    return Average(b, a);
   }
   return a + (b - a) / 2;
 }
