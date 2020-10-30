@@ -15,7 +15,7 @@ namespace mays {
 // § 7.20.6.1 ¶ 2 and footnote for the description of abs/labs/llabs behavior with INT_MIN in two's
 // complement.
 template <typename T>
-constexpr T Nabs(T i) {
+[[nodiscard]] constexpr T Nabs(T i) {
   static_assert(std::is_integral_v<T> && std::is_signed_v<T>, "Valid only for signed integers");
   // Check if signed right shift sign extends (i.e. arithmetic right shift).
   if constexpr (::mays::internal::has_arithmetic_shift_v<T>) {

@@ -25,7 +25,7 @@ namespace mays {
 //   // |3 / 2| evaluates to 1 and |5 / 2| to 2, so |a / 2 + b / 2| is wrong too
 //   constexpr int kGamma = Average(3, 5);  // kGamma = 4
 template <typename T>
-constexpr T Average(T a, T b) {
+[[nodiscard]] constexpr T Average(T a, T b) {
   static_assert(std::is_integral_v<T>, "Valid only for integers");
   if constexpr (std::is_signed_v<T>) {
     static_assert(::mays::internal::has_arithmetic_shift_v<T>,

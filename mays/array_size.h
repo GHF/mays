@@ -51,7 +51,7 @@ constexpr size_t array_size_v = array_size<T, Rank>::value;
 //   }
 template <size_t Rank = 0, typename T = void, size_t N = 0>
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-constexpr size_t ArraySize(const T (&)[N]) {
+[[nodiscard]] constexpr size_t ArraySize(const T (&)[N]) {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
   return ::mays::detail::array_size_v<T[N], Rank>;
 }
