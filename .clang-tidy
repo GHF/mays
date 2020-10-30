@@ -17,3 +17,8 @@ Checks: >
   readability-*,
   -readability-named-parameter,
 FormatStyle:     file
+CheckOptions:
+  - key:             bugprone-assert-side-effect.AssertMacros
+    value:           'CHECK,MAYS_CHECK,assert'
+  - key:             bugprone-assert-side-effect.CheckFunctionCalls
+    value:           'true'

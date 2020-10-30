@@ -17,8 +17,8 @@ class CheckFixture {
     condition_ = std::move(condition_string);
   }
 
-  bool handler_called() { return condition_.has_value(); }
-  const auto& condition() { return condition_; }
+  [[nodiscard]] bool handler_called() const { return condition_.has_value(); }
+  [[nodiscard]] const auto& condition() const { return condition_; }
 
  private:
   std::optional<std::string> condition_;
@@ -51,7 +51,7 @@ TEST_CASE_METHOD(CheckFixture,
 TEST_CASE_METHOD(CheckFixture, "Check false condition calls custom handler", "[base/assert]") {
   MAYS_CHECK(1 == 2);
 
-  CHECK(1 == handler_called());
+  CHECK(handler_called());
   REQUIRE(condition().has_value());
   CHECK_THAT(*condition(), Equals("1 == 2"));
 }
