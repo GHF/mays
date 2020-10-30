@@ -14,6 +14,16 @@ namespace mays {
 // Averages two signed integers without overflowing. The naive average |(a + b) / 2| is erroneous
 // when the sum of the inputs overflows integer limits. This function works by summing the halves of
 // the input values and then rounding the sum towards zero.
+//
+// Examples:
+//   // (100 + 120) would overflow a int8_t, so |(a + b) / 2| results in undefined behavior
+//   constexpr int8_t kAlpha = Average(int8_t{100}, int8_t{120});  // kAlpha = 110
+//
+//   // (120 - -100) would overflow similarly, so |a + (b - a) / 2| is wrong too
+//   constexpr int8_t kBeta = Average(int8_t{-100}, int8_t{120});  // kBeta = 10
+//
+//   // |3 / 2| evaluates to 1 and |5 / 2| to 2, so |a / 2 + b / 2| is wrong too
+//   constexpr int kGamma = Average(3, 5);  // kGamma = 4
 template <typename T>
 constexpr T Average(T a, T b) {
   static_assert(std::is_integral_v<T>, "Valid only for integers");
@@ -30,8 +40,8 @@ constexpr T Average(T a, T b) {
     return sum_halves + both_odd + round_to_zero;
   }
 
-  // Use a more compiler-friendly form for unsigned integers, where the absolute
-  // difference of a and b will always be in range.
+  // Use a more compiler-friendly form for unsigned integers, where the absolute difference of a and
+  // b will always be in range.
   if (a > b) {
     ::mays::internal::swap(a, b);
   }
