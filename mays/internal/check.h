@@ -4,6 +4,8 @@
 #ifndef MAYS_INTERNAL_CHECK_H
 #define MAYS_INTERNAL_CHECK_H
 
+#include <type_traits>
+
 #ifndef MAYS_HANDLE_CHECK_FAILURE
 #include <cstdlib>
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
@@ -17,10 +19,13 @@
 #endif  // __has_cpp_attribute(unlikely)
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define MAYS_CHECK(condition)                                            \
-  [&] {                                                                  \
-    if (!(condition))                                                    \
-      MAYS_ATTRIBUTE_UNLIKELY { MAYS_HANDLE_CHECK_FAILURE(#condition); } \
+#define MAYS_CHECK(condition)                                                                   \
+  [&] {                                                                                         \
+    static_assert(std::is_same_v<decltype(condition), bool>,                                    \
+                  "Condition expression must be type bool, not just convertible to type bool. " \
+                  "Example: MAYS_CHECK(ptr != nullptr) instead of MAYS_CHECK(ptr)");            \
+    if (!(condition))                                                                           \
+      MAYS_ATTRIBUTE_UNLIKELY { MAYS_HANDLE_CHECK_FAILURE(#condition); }                        \
   }()
 
 #endif  // MAYS_INTERNAL_CHECK_H
