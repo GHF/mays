@@ -48,7 +48,7 @@ TEST_CASE_METHOD(CheckFixture,
   }();
 }
 
-TEST_CASE_METHOD(CheckFixture, "Check false condition calls custom handler", "[base/assert]") {
+TEST_CASE_METHOD(CheckFixture, "Check false condition calls custom handler", "[internal/assert]") {
   MAYS_CHECK(1 == 2);
 
   CHECK(handler_called());
