@@ -12,10 +12,22 @@
 namespace mays {
 
 // Divides |dividend| by |divisor|, returning a quotient that is rounded away from zero. This is the
-// opposite rounding behavior to normal division. Often used in capacity computations.
+// opposite rounding behavior to normal division. This avoids the overflow in the naïve
+// implementation |(dividend + divisor - 1) / divisor| for large dividends. Often used in capacity
+// computations.
 //
 // Example:
-//   size_t num_chunks_needed = DivideRoundUp(bytes_needed, kChunkSize);
+//   size_t num_bytes_needed = DivideRoundUp(num_bits, size_t{8});
+//
+// Note that the return type follows the same integer promotion rules as normal division:
+//   auto quotient = DivideRoundUp(int8_t{1}, int{1});  // quotient has type int
+//   static_assert(std::is_same_v<decltype(quotient), int>);
+//
+// Also note that this does not allow you to divide between numbers of different signedness and
+// integer literals are typed, because signed numbers would be converted to unsigned in a lossy way:
+//   DivideRoundUp(int8_t{1}, 1);    // OK, |1| has type int
+//   DivideRoundUp(uint8_t{1}, 1U);  // OK, |1U| has type unsigned int
+//   DivideRoundUp(uint8_t{1}, 1);   // Won't compile
 template <typename N, typename D>
 [[nodiscard]] constexpr auto DivideRoundUp(N dividend, D divisor) -> decltype(dividend / divisor) {
   static_assert(std::is_integral_v<N> && std::is_integral_v<D>,
