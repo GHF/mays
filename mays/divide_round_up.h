@@ -24,21 +24,34 @@ template <typename N, typename D>
                 "dividend and divisor signedness don't match");
   MAYS_CHECK(divisor != 0);
 
-  if constexpr (std::is_unsigned_v<N>) {
-    if (dividend == 0) {
-      return 0;
-    }
-    return ((dividend - N{1}) / divisor) + 1;
+  // Avoid underflowing |dividend|
+  if (dividend == 0) {
+    return 0;
   }
 
-  // For signed numbers, quotient is negative iff only one of operands is negative, but remainder
-  // takes sign of dividend. Ensure that divisor is always non-negative to make sure division and
-  // modulo don't yield opposing signs.
-  if (divisor < 0) {
-    dividend = -dividend;
-    divisor = -divisor;
+  if constexpr (std::is_signed_v<N>) {
+    // ALTERNATE ALGORITHM: signed version of sliding range algorithm
+    if (false) {  // NOLINT(readability-simplify-boolean-expr)
+      const bool quotient_positive = !((dividend > 0) ^ (divisor > 0));
+      return (dividend - SignOf(dividend)) / divisor + (quotient_positive ? 1 : -1);
+    }
+
+    // For signed numbers, quotient is negative iff only one of operands is negative, but remainder
+    // takes sign of dividend. Ensure that divisor is always non-negative to make sure division and
+    // modulo don't yield opposing signs.
+    if (divisor < 0) {
+      dividend = -dividend;
+      divisor = -divisor;
+    }
+
+    // This consumes the remainder of the division, which might be slower or bloatier than the
+    // sliding range algorithm used for the unsigned version
+    return dividend / divisor + SignOf(dividend % divisor);
   }
-  return dividend / divisor + SignOf(dividend % divisor);
+
+  // By diminishing |dividend|, exact quotients are decreased by one and non-exact quotients remain
+  // the same. But all quotients are then increased by one, so the overall effect is to round up.
+  return (dividend - N{1}) / divisor + 1;
 }
 
 }  // namespace mays
