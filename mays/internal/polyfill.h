@@ -4,11 +4,17 @@
 #ifndef MAYS_INTERNAL_POLYFILL_H
 #define MAYS_INTERNAL_POLYFILL_H
 
+#include <version>
+
 #if __cpp_lib_constexpr_utility
 #include <utility>
 #else
 #include <type_traits>
 #endif  // __cpp_lib_constexpr_utility
+
+#if __cpp_lib_type_identity
+#include <type_traits>
+#endif  // __cpp_lib_type_identity
 
 namespace mays::internal {
 
@@ -25,6 +31,18 @@ constexpr void swap(T& x, T& y) {
   y = std::move(t);
 }
 #endif  // __cpp_lib_constexpr_utility
+
+#if __cpp_lib_type_identity
+using std::type_identity;
+#else
+template <typename T>
+struct type_identity {
+  using type = T;
+};
+
+template <class T>
+using type_identity_t = typename type_identity<T>::type;
+#endif  // __cpp_lib_type_identity
 
 }  // namespace mays::internal
 
