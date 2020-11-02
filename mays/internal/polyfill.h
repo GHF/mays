@@ -13,12 +13,6 @@
 #include <type_traits>
 #endif  // __cpp_lib_integer_comparison_functions
 
-#if __cpp_lib_constexpr_utility
-#include <utility>
-#else
-#include <type_traits>
-#endif  // __cpp_lib_constexpr_utility
-
 #if __cpp_lib_type_identity
 #include <type_traits>
 #endif  // __cpp_lib_type_identity
@@ -59,20 +53,6 @@ template <class T, class U>
   return !cmp_less(t, u);
 }
 #endif  // __cpp_lib_integer_comparison_functions
-
-#if __cpp_lib_constexpr_utility
-using std::swap;
-#else
-// std::swap is not constexpr until C++20. This does not accept array types.
-template <typename T>
-constexpr void swap(T& x, T& y) {
-  static_assert(std::is_move_constructible_v<T>);
-  static_assert(std::is_move_assignable_v<T>);
-  T t(std::move(x));
-  x = std::move(y);
-  y = std::move(t);
-}
-#endif  // __cpp_lib_constexpr_utility
 
 #if __cpp_lib_type_identity
 using std::type_identity;
