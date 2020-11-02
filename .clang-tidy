@@ -16,6 +16,7 @@ Checks: >
   performance-*,
   readability-*,
   -readability-named-parameter,
+  -readability-uppercase-literal-suffix,
 FormatStyle:     file
 CheckOptions:
   - key:             bugprone-assert-side-effect.AssertMacros
