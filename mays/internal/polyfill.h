@@ -6,6 +6,13 @@
 
 #include <version>
 
+#if __cpp_lib_integer_comparison_functions
+#include <utility>
+#else
+#include <limits>
+#include <type_traits>
+#endif  // __cpp_lib_integer_comparison_functions
+
 #if __cpp_lib_constexpr_utility
 #include <utility>
 #else
@@ -17,6 +24,41 @@
 #endif  // __cpp_lib_type_identity
 
 namespace mays::internal {
+
+#if __cpp_lib_integer_comparison_functions
+using std::cmp_greater;
+using std::cmp_greater_equal;
+using std::cmp_less;
+using std::cmp_less_equal;
+#else
+template <class T, class U>
+[[nodiscard]] constexpr bool cmp_less(T t, U u) {
+  using UT = std::make_unsigned_t<T>;
+  using UU = std::make_unsigned_t<U>;
+  if constexpr (std::is_signed_v<T> == std::is_signed_v<U>) {
+    return t < u;
+  } else if constexpr (std::is_signed_v<T>) {
+    return t < 0 ? true : UT(t) < u;
+  } else {
+    return u < 0 ? false : t < UU(u);
+  }
+}
+
+template <class T, class U>
+[[nodiscard]] constexpr bool cmp_greater(T t, U u) {
+  return cmp_less(u, t);
+}
+
+template <class T, class U>
+[[nodiscard]] constexpr bool cmp_less_equal(T t, U u) {
+  return !cmp_greater(t, u);
+}
+
+template <class T, class U>
+[[nodiscard]] constexpr bool cmp_greater_equal(T t, U u) {
+  return !cmp_less(t, u);
+}
+#endif  // __cpp_lib_integer_comparison_functions
 
 #if __cpp_lib_constexpr_utility
 using std::swap;
