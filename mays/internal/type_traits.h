@@ -9,11 +9,11 @@
 namespace mays::internal {
 
 // True if T sign-extends when right-shifted (two's complement representation is assumed).
-template <typename T, bool = std::is_signed_v<T>>
+template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
 struct has_arithmetic_shift : std::integral_constant<bool, (T{-1} >> 1) == T{-1}> {};
 
 template <typename T>
-inline constexpr bool has_arithmetic_shift_v = has_arithmetic_shift<T>::value;
+constexpr bool has_arithmetic_shift_v = has_arithmetic_shift<T>::value;
 
 }  // namespace mays::internal
 
