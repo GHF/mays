@@ -11,7 +11,7 @@
 namespace mays {
 namespace {
 
-TEST_CASE("Compute quotient ceiling", "[divide_round_up]") {
+TEST_CASE("Compute quotients rounded up", "[divide_round_up]") {
   SECTION("Zeroes") {
     static_assert(0 == DivideRoundUp(0, 1));
     static_assert(0 == DivideRoundUp(0, 2));
@@ -77,7 +77,7 @@ TEST_CASE("Round negative quotients away from zero", "[divide_round_up]") {
   }
 }
 
-TEST_CASE("Compute quotient ceilings of large dividends", "[divide_round_up]") {
+TEST_CASE("Compute quotients rounded up of large dividends", "[divide_round_up]") {
   // Check that the computation of "it takes 32 bytes to hold 255 bits" does not overflow, even when
   // done using unsigned 8-bit arithmetic
   static_assert((std::numeric_limits<uint8_t>::max() + 1U) / CHAR_BIT ==
@@ -90,6 +90,22 @@ TEST_CASE("Compute quotient ceilings of large dividends", "[divide_round_up]") {
   // For signed negative numbers: 16 == DivideRoundUp(-127 / 8)
   static_assert((std::numeric_limits<int8_t>::min()) / int{CHAR_BIT} ==
                 DivideRoundUp(std::numeric_limits<int8_t>::min() + 1, int8_t{CHAR_BIT}));
+
+  // Dividend + divisor would over- or underflow
+  static_assert(2 == DivideRoundUp(int8_t{64 + 1}, int8_t{64}));
+  static_assert(2 == DivideRoundUp(int8_t{-64 - 1}, int8_t{-64}));
+}
+
+TEST_CASE("Compute quotients rounded up of mixed types", "[divide_round_up") {
+  // sizeof as an argument
+  static_assert(2U == DivideRoundUp(sizeof(uint64_t), sizeof(uint32_t)));
+  static_assert(2U == DivideRoundUp(8U, sizeof(uint32_t)));
+  static_assert(3U == DivideRoundUp(sizeof(uint64_t), 3U));
+
+  // Promotion
+  static_assert(0x100 == DivideRoundUp(0x200, int8_t{2}));
+  static_assert(-128 - 1 == DivideRoundUp(-128 - 1, int8_t{1}));
+  static_assert(0x100U == DivideRoundUp(0x200U, uint8_t{2}));
 }
 
 }  // namespace

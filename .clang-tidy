@@ -23,3 +23,7 @@ CheckOptions:
     value:           'MAYS_CHECK,assert'
   - key:             bugprone-assert-side-effect.CheckFunctionCalls
     value:           'true'
+  - key:             cppcoreguidelines-avoid-magic-numbers.IgnorePowersOf2IntegerValues
+    value:           'true'
+  - key:             readability-magic-numbers.IgnorePowersOf2IntegerValues
+    value:           'true'
