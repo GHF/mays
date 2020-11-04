@@ -45,9 +45,7 @@ TEST_CASE("Compute quotient approximation", "[divide_round_nearest]") {
   }
 
   SECTION("0 < remainder < .5") {
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     static_assert(1 == DivideRoundNearest(4, 3));
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     static_assert(1U == DivideRoundNearest(4U, 3U));
   }
 

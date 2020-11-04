@@ -11,7 +11,8 @@ namespace {
 TEST_CASE("Clamp integer value to range", "[clamp]") {
   constexpr auto kLower = 1;
   constexpr auto kUpper = 10;
-  static_assert(5 == Clamp(5, kLower, kUpper));
+  constexpr auto kInRange = 5;
+  static_assert(kInRange == Clamp(kInRange, kLower, kUpper));
   static_assert(kLower == Clamp(kLower, kLower, kUpper));
   static_assert(kLower == Clamp(kLower - 1, kLower, kUpper));
   static_assert(kUpper == Clamp(kUpper, kLower, kUpper));
@@ -25,8 +26,8 @@ TEST_CASE("Clamp integer value to range", "[clamp]") {
 TEST_CASE("Clamp floating point value to range", "[clamp]") {
   constexpr auto kLower = 1.;
   constexpr auto kUpper = 10.;
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-  static_assert(5. == Clamp(5., kLower, kUpper));
+  constexpr auto kInRange = 5.;
+  static_assert(kInRange == Clamp(kInRange, kLower, kUpper));
   static_assert(kLower == Clamp(kLower, kLower, kUpper));
   static_assert(kLower == Clamp(kLower - 1, kLower, kUpper));
   static_assert(kUpper == Clamp(kUpper, kLower, kUpper));
@@ -41,8 +42,7 @@ TEST_CASE("Clamp floating point value to range", "[clamp]") {
   static_assert(+0. == Clamp(+0., -1., -0.));
 
   // |float| bounds for a |double| value
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-  static_assert(1. == Clamp(2., -1.f, 1.f));
+  static_assert(1. == Clamp(100., -1.f, 1.f));
 
   // Clamp infinity and clamp to infinities
   if constexpr (std::numeric_limits<float>::has_infinity) {
