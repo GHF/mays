@@ -75,6 +75,10 @@ TEST_CASE("Round negative quotients away from zero", "[divide_round_up]") {
     static_assert(-2 == DivideRoundUp(-2, 1));
     static_assert(-2 == DivideRoundUp(2, -1));
   }
+
+  SECTION("Quotient of least magnitude possible") {
+    static_assert(-1 == DivideRoundUp(1, std::numeric_limits<int>::min()));
+  }
 }
 
 TEST_CASE("Compute quotients rounded up of large dividends", "[divide_round_up]") {

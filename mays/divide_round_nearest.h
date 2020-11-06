@@ -8,7 +8,7 @@
 
 #include "internal/check.h"
 #include "nabs.h"
-#include "sign_of.h"
+#include "negate_if.h"
 
 namespace mays {
 
@@ -41,9 +41,9 @@ template <typename N, typename D>
   if constexpr (std::is_signed_v<N>) {
     // Same algorithm as for unsigned but remainder and half-divisor are mapped to negative values
     // with Nabs to easily compare them
-    const bool quotient_positive = !((dividend > 0) ^ (divisor > 0));
+    const bool quotient_positive = ((dividend > 0) == (divisor > 0));
     const QuotientT round_away = Nabs(dividend % divisor) < (Nabs(divisor) + 1) / 2;
-    return dividend / divisor + round_away * (quotient_positive ? 1 : -1);
+    return dividend / divisor - NegateIf(round_away, quotient_positive);
   }
 
   // Equals one if the remainder is greater than or equal to half of divisor
