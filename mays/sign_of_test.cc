@@ -3,6 +3,8 @@
 
 #include "sign_of.h"
 
+#include <limits>
+
 #include <catch2/catch.hpp>
 
 namespace mays {
