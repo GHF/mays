@@ -8,6 +8,7 @@ target_sources(${PROJECT_NAME}
     divide_round_up.h
     divide_round_nearest.h
     nabs.h
+    negate_if.h
     sign_of.h
 )
 
@@ -19,5 +20,6 @@ target_sources(${PROJECT_NAME}_tests
     divide_round_up_test.cc
     divide_round_nearest_test.cc
     nabs_test.cc
+    negate_if_test.cc
     sign_of_test.cc
 )
