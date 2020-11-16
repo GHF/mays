@@ -64,9 +64,15 @@ TEST_CASE("Scale doesn't overflow naively", "[scale]") {
 
   // This should fail because the result would overflow the output type.
   // static_assert(128 == Scale(int8_t{118}, numerator, denominator));
+}
 
-  // This should fail to compile because the choice of ratio may result in overflow.
-  // [[maybe_unused]] constexpr int8_t scaled = Scale<int8_t, int8_t, int8_t>(1, 11, 100);
+TEST_CASE("Scale has no restrictions on types smaller than int", "[scale]") {
+  // This ratio generates remainders that would overflow computations done with only int8_t.
+  const int8_t numerator = 11;
+  const int8_t denominator = 100;
+  const auto [result, x] = GENERATE(table<int, int8_t>({{13, 127}, {1, 10}}));
+  CHECK(result == Scale(x, numerator, denominator));
+  CHECK(-result == Scale(-x, numerator, denominator));
 }
 
 }  // namespace

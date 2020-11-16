@@ -13,10 +13,11 @@
 namespace mays {
 
 // Multiplies a value |x| against a ratio of |numerator| over |denominator| while maintaining
-// precision and avoiding unnecessary overflow.
+// precision and avoiding unnecessary overflow. Note that the final result may still overflow the
+// type that it represents if the ratio is over one.
 //
 // Example:
-//   int scaled = Scale(100'000, 30'000, 32'768);  // |scaled| is 91'552
+//   int scaled = Scale(30'000'000, 1000, 1001);  // |scaled| is 29'970'029
 template <typename T, typename N, typename D>
 [[nodiscard]] constexpr std::common_type_t<T, N, D> Scale(T x, N numerator, D denominator) {
   static_assert(std::is_integral_v<T> && std::is_integral_v<N> && std::is_integral_v<D>,
@@ -36,10 +37,15 @@ template <typename T, typename N, typename D>
     return x * (numerator * denominator);
   }
 
+  // For types smaller than int, let promotion do the work.
+  using int_t = std::common_type_t<T, N, D>;
+  if constexpr (2 * sizeof(int_t) <= sizeof(decltype(x * numerator / denominator))) {
+    return static_cast<int_t>(x * numerator / denominator);
+  }
+
   // Magnitude of remainder is in the range [0, |denominator|), so check that the intermediate value
   // remainder * numerator can't overflow. The division is made safe by the unit rate optimization
   // branch above.
-  using int_t = std::common_type_t<T, N, D>;
   if constexpr (std::is_signed_v<int_t>) {
     // NOLINTNEXTLINE(bugprone-assert-side-effect)
     MAYS_CHECK(Nabs(numerator) >= std::numeric_limits<int_t>::max() / (Nabs(denominator) + 1));
