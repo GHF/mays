@@ -13,6 +13,9 @@
 #endif  // MAYS_HANDLE_CHECK_FAILURE
 
 #if __has_cpp_attribute(unlikely)
+#if __cplusplus < 202002L
+#pragma clang diagnostic ignored "-Wc++20-extensions"
+#endif  // __cplusplus < 202002L
 #define MAYS_ATTRIBUTE_UNLIKELY [[unlikely]]
 #else
 #define MAYS_ATTRIBUTE_UNLIKELY
