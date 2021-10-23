@@ -21,7 +21,7 @@ template <typename T>
   static_assert(std::is_integral_v<T>, "Function is valid only for integers");
 
   // Branch-free version
-  if (false) {
+  if constexpr (false) {  // NOLINT(readability-simplify-boolean-expr)
     using TU = std::make_unsigned_t<T>;
     // Splat negate bit into all bit positions. |sign| takes a value of either 0 or -1.
     const auto sign = static_cast<TU>(-T{negate});

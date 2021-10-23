@@ -15,6 +15,7 @@ Checks: >
   -modernize-use-trailing-return-type,
   performance-*,
   readability-*,
+  -readability-function-cognitive-complexity,
   -readability-named-parameter,
   -readability-uppercase-literal-suffix,
 FormatStyle:     file

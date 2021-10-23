@@ -16,7 +16,7 @@
 #if __cplusplus < 202002L
 #pragma clang diagnostic ignored "-Wc++20-extensions"
 #endif  // __cplusplus < 202002L
-#define MAYS_ATTRIBUTE_UNLIKELY [[unlikely]]
+#define MAYS_ATTRIBUTE_UNLIKELY [[unlikely]]  // NOLINT(cppcoreguidelines-macro-usage)
 #else
 #define MAYS_ATTRIBUTE_UNLIKELY
 #endif  // __has_cpp_attribute(unlikely)
