@@ -74,6 +74,34 @@ TEST_CASE("Scale unsigned value by a ratio", "[scale]") {
   CHECK(result == Scale(x, numerator, denominator));
 }
 
+// NOLINTNEXTLINE
+TEMPLATE_TEST_CASE("Scale value by a ratio with a RoundPolicy",
+                   "[scale]",
+                   int,
+                   unsigned,
+                   int8_t,
+                   uint16_t) {
+  const auto [round_policy, numerator, denominator, result] =
+      GENERATE_COPY(table<RoundPolicy, TestType, TestType, TestType>({
+          // One and a half
+          {RoundPolicy::kRoundTowardZero, 3, 2, 1},
+          {RoundPolicy::kRoundToNearest, 3, 2, 2},
+          {RoundPolicy::kRoundAwayFromZero, 3, 2, 2},
+
+          // 0 < |remainder| < .5
+          {RoundPolicy::kRoundTowardZero, 4, 3, 1},
+          {RoundPolicy::kRoundToNearest, 4, 3, 1},
+          {RoundPolicy::kRoundAwayFromZero, 4, 3, 2},
+
+          // .5 < |remainder| < 1
+          {RoundPolicy::kRoundTowardZero, 5, 3, 1},
+          {RoundPolicy::kRoundToNearest, 5, 3, 2},
+          {RoundPolicy::kRoundAwayFromZero, 5, 3, 2},
+      }));
+  CAPTURE(round_policy, numerator, denominator);
+  CHECK(result == Scale(TestType{1}, numerator, denominator, round_policy));
+}
+
 TEST_CASE("Scale value by an integer unit rate", "[scale]") {
   const int scale = GENERATE(2, 1, -1, -2);
   const int a = 10 * scale;

@@ -9,6 +9,7 @@
 #include <limits>
 #include <type_traits>
 
+#include "divide.h"
 #include "internal/check.h"
 #include "nabs.h"
 
@@ -16,7 +17,7 @@ namespace mays {
 
 // Construct an object that multiplies a integer of type |In| against a ratio of |numerator| over
 // |denominator| while maintaining precision and avoiding unnecessary overflow. Results that are not
-// integers will be rounded towards zero.
+// integers will be rounded per |round_policy|.
 //
 // Note that the final result may still overflow its domain (if the numerator/denominator ratio is
 // over 1) and it's difficult to determine when this will happen because scaling integers is usually
@@ -41,7 +42,8 @@ class Scaler final {
     MAYS_CHECK(is_unit_rate() || can_promote() || can_pre_divide());
   }
 
-  [[nodiscard]] constexpr Out Scale(In in) const {
+  [[nodiscard]] constexpr Out Scale(In in, RoundPolicy round_policy = RoundPolicy::kRoundTowardZero)
+      const {
     // Optimize out the division if possible.
     if (is_unit_rate()) {
       return in * (numerator_ * denominator_);
@@ -49,12 +51,13 @@ class Scaler final {
 
     // For types smaller than int, let promotion do the work.
     if constexpr (can_promote()) {
-      return static_cast<Out>(in * numerator_ / denominator_);
+      return static_cast<Out>(
+          Divide<Intermediate, Intermediate>(round_policy, in * numerator_, denominator_));
     } else {
       MAYS_CHECK(can_pre_divide());
       const Intermediate quotient = in / denominator_;
       const Intermediate remainder = in % denominator_;
-      return quotient * numerator_ + remainder * numerator_ / denominator_;
+      return quotient * numerator_ + Divide(round_policy, remainder * numerator_, denominator_);
     }
   }
 
@@ -107,7 +110,7 @@ template <typename T, typename N, typename D>
 
 // Multiplies a value |x| against a ratio of |numerator| over |denominator| while maintaining
 // precision and avoiding unnecessary overflow. Results that are not integers will be rounded
-// towards zero.
+// per |round_policy|.
 //
 // Note that the final result may still overflow its domain and it's difficult to determine when
 // |denominator| while maintaining precision and avoiding unnecessary overflow. Results that are not
@@ -116,9 +119,10 @@ template <typename T, typename N, typename D>
 // Example:
 //   int scaled = Scale(30'000'000, 1000, 1001);  // |scaled| is 29'970'029
 template <typename T, typename N, typename D>
-[[nodiscard]] constexpr typename Scaler<T, N, D>::Out Scale(T x, N numerator, D denominator) {
+[[nodiscard]] constexpr typename Scaler<T, N, D>::Out
+Scale(T x, N numerator, D denominator, RoundPolicy round_policy = RoundPolicy::kRoundTowardZero) {
   const auto scaler = MakeScaler<T>(numerator, denominator);
-  return scaler.Scale(x);
+  return scaler.Scale(x, round_policy);
 }
 
 }  // namespace mays
