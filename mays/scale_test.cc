@@ -1,5 +1,6 @@
 // (C) Copyright 2020 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #include "scale.h"
 
@@ -8,7 +9,7 @@
 namespace mays {
 namespace {
 
-TEST_CASE("Scale value by a ratio", "[scale]") {
+TEST_CASE("Scale signed value by a ratio", "[scale]") {
   const int a = 3;
   const int b = 1000;
   const auto [result, x, numerator, denominator] = GENERATE_COPY(table<int, int, int, int>({
@@ -20,31 +21,57 @@ TEST_CASE("Scale value by a ratio", "[scale]") {
 
       // Scale the value 1
       {0, 1, a, b},
-      {333, 1, b, a},
+      {333, 1, b, a},  // rounded towards zero
       {1, 1, a, a},
       {0, 1, 0, b},
 
       // Scale the value 2
       {0, 2, a, b},
-      {666, 2, b, a},
+      {666, 2, b, a},  // rounded towards zero
       {2, 2, a, a},
       {0, 2, 0, b},
 
       // Scale the value -1
       {0, -1, a, b},
-      {-333, -1, b, a},
+      {-333, -1, b, a},  // rounded towards zero
       {-1, -1, a, a},
       {0, -1, 0, b},
 
       // Scale the value -2
       {0, -2, a, b},
-      {-666, -2, b, a},
+      {-666, -2, b, a},  // rounded towards zero
       {-2, -2, a, a},
       {0, -2, 0, b},
   }));
   const auto scaler = MakeScaler<decltype(x)>(numerator, denominator);
   CHECK(result == scaler.Scale(x));
   CHECK(-result == scaler.Scale(-x));
+}
+
+TEST_CASE("Scale unsigned value by a ratio", "[scale]") {
+  const unsigned a = 3;
+  const unsigned b = 1000;
+  const auto [result, x, numerator, denominator] =
+      GENERATE_COPY(table<unsigned, unsigned, unsigned, unsigned>({
+          // Scale the value 0
+          {0, 0, a, b},
+          {0, 0, b, a},
+          {0, 0, a, a},
+          {0, 0, 0, b},
+
+          // Scale the value 1
+          {0, 1, a, b},
+          {333, 1, b, a},  // rounded towards zero
+          {1, 1, a, a},
+          {0, 1, 0, b},
+
+          // Scale the value 2
+          {0, 2, a, b},
+          {666, 2, b, a},  // rounded towards zero
+          {2, 2, a, a},
+          {0, 2, 0, b},
+      }));
+  CHECK(result == Scale(x, numerator, denominator));
 }
 
 TEST_CASE("Scale value by an integer unit rate", "[scale]") {
@@ -58,7 +85,7 @@ TEST_CASE("Scale value by an integer unit rate", "[scale]") {
   static_assert(29970 == scaler.Scale(30'000));  // |scaled| is 29'970
 }
 
-TEST_CASE("Scale doesn't overflow naively", "[scale]") {
+TEST_CASE("Scale doesn't overflow int8_t naively", "[scale]") {
   // 107 * 11 would overflow past std::numeric_limits<int8_t>::max()
   const auto [result, x] = GENERATE(table<int, int8_t>({{118, 109}, {127, 117}}));
   const int8_t numerator = 12;
@@ -69,6 +96,14 @@ TEST_CASE("Scale doesn't overflow naively", "[scale]") {
 
   // This should fail because the result would overflow the output type.
   // static_assert(128 == Scale(int8_t{118}, numerator, denominator));
+}
+
+TEST_CASE("Scale doesn't overflow uint8_t naively", "[scale]") {
+  // 107 * 11 would overflow past std::numeric_limits<int8_t>::max()
+  const auto [result, x] = GENERATE(table<unsigned int, uint8_t>({{249, 229}, {255, 234}}));
+  const uint8_t numerator = 12;
+  const uint8_t denominator = 11;
+  CHECK(result == Scale(x, numerator, denominator));
 }
 
 TEST_CASE("Scale has no restrictions on types smaller than int", "[scale]") {

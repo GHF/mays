@@ -1,5 +1,6 @@
 // (C) Copyright 2014 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #ifndef MAYS_SCALE_H
 #define MAYS_SCALE_H
@@ -14,8 +15,12 @@
 namespace mays {
 
 // Construct an object that multiplies a integer of type |In| against a ratio of |numerator| over
-// |denominator| while maintaining precision and avoiding unnecessary overflow. Note that the final
-// result may still overflow its domain.
+// |denominator| while maintaining precision and avoiding unnecessary overflow. Results that are not
+// integers will be rounded towards zero.
+//
+// Note that the final result may still overflow its domain (if the numerator/denominator ratio is
+// over 1) and it's difficult to determine when this will happen because scaling integers is usually
+// a precision-losing process.
 //
 // This object may be constructed as constexpr or constinit to get compile-type checking.
 //
@@ -54,6 +59,8 @@ class Scaler final {
   }
 
  private:
+  // Note that this may be |int| even if all the types are unsigned, if each of the types can be
+  // converted to |int| without narrowing.
   using Intermediate =
       decltype(std::declval<In>() * std::declval<Numerator>() / std::declval<Denominator>());
 
@@ -80,7 +87,7 @@ class Scaler final {
     // Magnitude of remainder is in the range [0, |denominator|), so check that the intermediate
     // value remainder * numerator can't overflow. Avoid this check for this unit rate case
     // because it divides by zero.
-    if constexpr (std::is_signed_v<Intermediate>) {
+    if constexpr (std::is_signed_v<In>) {
       return Nabs(numerator_) >=
              std::numeric_limits<Intermediate>::max() / (Nabs(denominator_) + 1);
     }
@@ -99,8 +106,12 @@ template <typename T, typename N, typename D>
 }
 
 // Multiplies a value |x| against a ratio of |numerator| over |denominator| while maintaining
-// precision and avoiding unnecessary overflow. Note that the final result may still overflow the
-// type that it represents if the ratio is over one.
+// precision and avoiding unnecessary overflow. Results that are not integers will be rounded
+// towards zero.
+//
+// Note that the final result may still overflow its domain and it's difficult to determine when
+// |denominator| while maintaining precision and avoiding unnecessary overflow. Results that are not
+// integers will be rounded towards zero.
 //
 // Example:
 //   int scaled = Scale(30'000'000, 1000, 1001);  // |scaled| is 29'970'029
