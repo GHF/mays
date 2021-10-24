@@ -76,6 +76,9 @@ class Scaler final {
                 "Arguments' signedness don't match");
 
   [[nodiscard]] constexpr bool is_unit_rate() const {
+    if (numerator_ == 0) {
+      return true;
+    }
     if constexpr (std::is_signed_v<In>) {
       return Nabs(denominator_) == -1 && Nabs(numerator_) <= Nabs(denominator_);
     }

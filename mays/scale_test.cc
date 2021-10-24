@@ -144,5 +144,10 @@ TEST_CASE("Scale has no restrictions on types smaller than int", "[scale]") {
   CHECK(-result == scaler.Scale(-x));
 }
 
+// NOLINTNEXTLINE
+TEMPLATE_TEST_CASE("Scale can handle ratio 0/1", "[scale]", int, unsigned) {
+  CHECK(0 == Scale<TestType, TestType, TestType>(1, 0, 1));
+}
+
 }  // namespace
 }  // namespace mays
