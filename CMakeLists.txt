@@ -1,3 +1,4 @@
+# vim: et:sw=2:ts=2:tw=100
 # Required by FetchContent_MakeAvailable
 cmake_minimum_required(VERSION 3.14)
 
@@ -20,6 +21,10 @@ if(TOP_LEVEL_PROJECT)
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
     GIT_TAG        v2.13.7)
   FetchContent_MakeAvailable(Catch2)
+
+  # Make include directories be included as system headers to avoid clang-tidy diagnostics
+  get_target_property(CATCH2_INC Catch2 INTERFACE_INCLUDE_DIRECTORIES)
+  set_target_properties(Catch2 PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${CATCH2_INC}")
   list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/contrib)
 
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
