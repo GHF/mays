@@ -1,10 +1,13 @@
 // (C) Copyright 2020 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #ifndef MAYS_DIVIDE_ROUND_NEAREST_H
 #define MAYS_DIVIDE_ROUND_NEAREST_H
 
+#include <limits>
 #include <type_traits>
+#include <utility>
 
 #include "internal/check.h"
 #include "nabs.h"
@@ -13,7 +16,7 @@
 namespace mays {
 
 // Divides |dividend| by |divisor|, returning a quotient that is rounded to the nearest integer.
-// Halves are rounded away from zero.
+// Halves are rounded away from zero. Checks for divide-by-zero and signed overflow.
 //
 // Example:
 //   int quotient = DivideRoundNearest(3, 4);  // |quotient| is 1
@@ -28,9 +31,8 @@ namespace mays {
 //   DivideRoundNearest(int8_t{1}, 1);    // OK, |1| has type int
 //   DivideRoundNearest(uint8_t{1}, 1U);  // OK, |1U| has type unsigned int
 //   DivideRoundNearest(uint8_t{1}, 1);   // Won't compile
-template <typename N, typename D>
-[[nodiscard]] constexpr auto DivideRoundNearest(N dividend, D divisor)
-    -> decltype(dividend / divisor) {
+template <typename N, typename D, typename Return = decltype(std::declval<N>() / std::declval<D>())>
+[[nodiscard]] constexpr Return DivideRoundNearest(N dividend, D divisor) {
   static_assert(std::is_integral_v<N> && std::is_integral_v<D>,
                 "Function is valid only for integers");
   static_assert(std::is_signed_v<N> == std::is_signed_v<D>,
@@ -39,6 +41,11 @@ template <typename N, typename D>
 
   using QuotientT = decltype(dividend / divisor);
   if constexpr (std::is_signed_v<N>) {
+    if constexpr (std::is_signed_v<D>) {
+      // NOLINTNEXTLINE(bugprone-assert-side-effect)
+      MAYS_CHECK(!(dividend == std::numeric_limits<Return>::min() && divisor == D{-1}));
+    }
+
     // Same algorithm as for unsigned but remainder and half-divisor are mapped to negative values
     // with Nabs to easily compare them
     const bool quotient_positive = ((dividend > 0) == (divisor > 0));

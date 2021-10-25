@@ -1,10 +1,13 @@
 // (C) Copyright 2020 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #ifndef MAYS_DIVIDE_ROUND_UP_H
 #define MAYS_DIVIDE_ROUND_UP_H
 
+#include <limits>
 #include <type_traits>
+#include <utility>
 
 #include "internal/check.h"
 #include "negate_if.h"
@@ -15,7 +18,7 @@ namespace mays {
 // Divides |dividend| by |divisor|, returning a quotient that is rounded away from zero. This is the
 // opposite rounding behavior to normal division. This avoids the overflow in the naïve
 // implementation |(dividend + divisor - 1) / divisor| for large dividends. Often used in capacity
-// computations.
+// computations. Checks for divide-by-zero and signed overflow.
 //
 // Example:
 //   size_t num_bytes_needed = DivideRoundUp(num_bits, size_t{8});
@@ -29,8 +32,8 @@ namespace mays {
 //   DivideRoundUp(int8_t{1}, 1);    // OK, |1| has type int
 //   DivideRoundUp(uint8_t{1}, 1U);  // OK, |1U| has type unsigned int
 //   DivideRoundUp(uint8_t{1}, 1);   // Won't compile
-template <typename N, typename D>
-[[nodiscard]] constexpr auto DivideRoundUp(N dividend, D divisor) -> decltype(dividend / divisor) {
+template <typename N, typename D, typename Return = decltype(std::declval<N>() / std::declval<D>())>
+[[nodiscard]] constexpr Return DivideRoundUp(N dividend, D divisor) {
   static_assert(std::is_integral_v<N> && std::is_integral_v<D>,
                 "Function is valid only for integers");
   static_assert(std::is_signed_v<N> == std::is_signed_v<D>,
@@ -43,6 +46,11 @@ template <typename N, typename D>
   }
 
   if constexpr (std::is_signed_v<N>) {
+    if constexpr (std::is_signed_v<D>) {
+      // NOLINTNEXTLINE(bugprone-assert-side-effect)
+      MAYS_CHECK(!(dividend == std::numeric_limits<Return>::min() && divisor == D{-1}));
+    }
+
     // ALTERNATE ALGORITHM: signed version of sliding range method that does not need remainder
     if (false) {  // NOLINT(readability-simplify-boolean-expr)
       const bool quotient_positive = ((dividend > 0) == (divisor > 0));

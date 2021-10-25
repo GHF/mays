@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 // vim: et:sw=2:ts=2:tw=100
 
-#include <catch2/catch.hpp>
-
 #include "divide.h"
+
+#include <catch2/catch.hpp>
 
 namespace mays {
 namespace {
