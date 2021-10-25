@@ -10,6 +10,7 @@ target_sources(${PROJECT_NAME}
     divide_round_nearest.h
     nabs.h
     negate_if.h
+    range_map.h
     round_policy.h
     scale.h
     sign_of.h
@@ -25,6 +26,7 @@ target_sources(${PROJECT_NAME}_tests
     divide_round_nearest_test.cc
     nabs_test.cc
     negate_if_test.cc
+    range_map_test.cc
     scale_test.cc
     sign_of_test.cc
 )
