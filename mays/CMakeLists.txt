@@ -14,6 +14,7 @@ target_sources(${PROJECT_NAME}
     round_policy.h
     scale.h
     sign_of.h
+    subtract.h
 )
 
 target_sources(${PROJECT_NAME}_tests
@@ -29,4 +30,5 @@ target_sources(${PROJECT_NAME}_tests
     range_map_test.cc
     scale_test.cc
     sign_of_test.cc
+    subtract_test.cc
 )

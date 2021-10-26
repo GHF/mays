@@ -17,6 +17,7 @@
 #include "nabs.h"
 #include "negate_if.h"
 #include "scale.h"
+#include "subtract.h"
 
 namespace mays {
 
@@ -94,21 +95,16 @@ class RangeMap final {
   constexpr Intermediate in_width() const {
     MAYS_CHECK(in_lo_ < in_hi_);
     MAYS_CHECK(deadband_ >= 0);
-    // Input width might overflow Intermediate, so conservatively limit their magnitudes.
-    // NOLINTNEXTLINE(bugprone-assert-side-effect)
-    MAYS_CHECK(Nabs(in_hi_) > std::numeric_limits<Intermediate>::min() / 2);
-    // NOLINTNEXTLINE(bugprone-assert-side-effect)
-    MAYS_CHECK(Nabs(in_lo_) > std::numeric_limits<Intermediate>::min() / 2);
-    MAYS_CHECK(Intermediate{in_hi_} - in_lo_ > 2 * deadband_);
-    return Intermediate{in_hi_} - in_lo_ - 2 * deadband_;
+    auto width = SubtractInto<Intermediate>(in_hi_, in_lo_);
+    MAYS_CHECK(width.has_value());              // NOLINT(bugprone-assert-side-effect)
+    MAYS_CHECK(width.value() > 2 * deadband_);  // NOLINT(bugprone-assert-side-effect)
+    return width.value() - 2 * deadband_;
   }
 
   constexpr Intermediate out_width() const {
-    // NOLINTNEXTLINE(bugprone-assert-side-effect)
-    MAYS_CHECK(Nabs(std::get<1>(out_range_)) > std::numeric_limits<Intermediate>::min() / 2);
-    // NOLINTNEXTLINE(bugprone-assert-side-effect)
-    MAYS_CHECK(Nabs(std::get<0>(out_range_)) > std::numeric_limits<Intermediate>::min() / 2);
-    return Intermediate{std::get<1>(out_range_)} - std::get<0>(out_range_);
+    auto width = SubtractInto<Intermediate>(std::get<1>(out_range_), std::get<0>(out_range_));
+    MAYS_CHECK(width.has_value());  // NOLINT(bugprone-assert-side-effect)
+    return width.value();
   }
 
   [[nodiscard]] constexpr bool requires_out_clamp() const {
