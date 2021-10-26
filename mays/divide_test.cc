@@ -31,5 +31,12 @@ TEST_CASE("Divide computes quotient based on RoundPolicy", "[divide]") {
   CHECK(c == Divide(round_policy, a, b));
 }
 
+TEST_CASE("Divide returns nullopt for divide-by-zero and overflow", "[divide]") {
+  const RoundPolicy round_policy = GENERATE(
+      RoundPolicy::kRoundTowardZero, RoundPolicy::kRoundToNearest, RoundPolicy::kRoundAwayFromZero);
+  CHECK(!Divide(round_policy, std::numeric_limits<int>::min(), -1).has_value());
+  CHECK(!Divide(round_policy, 1, 0).has_value());
+}
+
 }  // namespace
 }  // namespace mays

@@ -6,6 +6,7 @@
 #define MAYS_DIVIDE_H
 
 #include <limits>
+#include <optional>
 #include <type_traits>
 #include <utility>
 
@@ -16,14 +17,21 @@
 namespace mays {
 
 // Computes the quotient of a pair of number using the RoundPolicy specified.
-// Checks for divide-by-zero and signed overflow.
-template <typename N, typename D, typename Return = decltype(std::declval<N>() / std::declval<D>())>
-[[nodiscard]] constexpr Return Divide(RoundPolicy round_policy, N dividend, D divisor) {
+// Returns std::nullopt in case of divide-by-zero or signed overflow.
+template <typename N,
+          typename D,
+          typename Quotient = decltype(std::declval<N>() / std::declval<D>())>
+[[nodiscard]] constexpr std::optional<Quotient> Divide(RoundPolicy round_policy,
+                                                       N dividend,
+                                                       D divisor) {
   if (round_policy == RoundPolicy::kRoundTowardZero) {
-    MAYS_CHECK(divisor != 0);
+    if (divisor == 0) {
+      return std::nullopt;
+    }
     if constexpr (std::is_signed_v<N> && std::is_signed_v<D>) {
-      // NOLINTNEXTLINE(bugprone-assert-side-effect)
-      MAYS_CHECK(!(dividend == std::numeric_limits<Return>::min() && divisor == D{-1}));
+      if (dividend == std::numeric_limits<Quotient>::min() && divisor == D{-1}) {
+        return std::nullopt;
+      }
     }
     return dividend / divisor;
   }

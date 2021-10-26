@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <limits>
+#include <optional>
 #include <type_traits>
 
 #include "divide.h"
@@ -42,8 +43,9 @@ class Scaler final {
     MAYS_CHECK(is_unit_rate() || can_promote() || can_pre_divide());
   }
 
-  [[nodiscard]] constexpr Out Scale(In in, RoundPolicy round_policy = RoundPolicy::kRoundTowardZero)
-      const {
+  [[nodiscard]] constexpr std::optional<Out> Scale(
+      In in,
+      RoundPolicy round_policy = RoundPolicy::kRoundTowardZero) const {
     // Optimize out the division if possible.
     if (is_unit_rate()) {
       return in * (numerator_ * denominator_);
@@ -51,13 +53,16 @@ class Scaler final {
 
     // For types smaller than int, let promotion do the work.
     if constexpr (can_promote()) {
-      return static_cast<Out>(
-          Divide<Intermediate, Intermediate>(round_policy, in * numerator_, denominator_));
+      return Divide<Intermediate, Intermediate>(round_policy, in * numerator_, denominator_);
     } else {
       MAYS_CHECK(can_pre_divide());
       const Intermediate quotient = in / denominator_;
       const Intermediate remainder = in % denominator_;
-      return quotient * numerator_ + Divide(round_policy, remainder * numerator_, denominator_);
+      const auto scaled_remainder = Divide(round_policy, remainder * numerator_, denominator_);
+      if (!scaled_remainder.has_value()) {
+        return std::nullopt;
+      }
+      return quotient * numerator_ + scaled_remainder.value();
     }
   }
 
@@ -122,7 +127,7 @@ template <typename T, typename N, typename D>
 // Example:
 //   int scaled = Scale(30'000'000, 1000, 1001);  // |scaled| is 29'970'029
 template <typename T, typename N, typename D>
-[[nodiscard]] constexpr typename Scaler<T, N, D>::Out
+[[nodiscard]] constexpr std::optional<typename Scaler<T, N, D>::Out>
 Scale(T x, N numerator, D denominator, RoundPolicy round_policy = RoundPolicy::kRoundTowardZero) {
   const auto scaler = MakeScaler<T>(numerator, denominator);
   return scaler.Scale(x, round_policy);

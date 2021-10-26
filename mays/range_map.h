@@ -73,9 +73,10 @@ class RangeMap final {
     // deadband map to 0.
     const auto centered_output =
         in_to_out_scaler_.Scale(centered_input, RoundPolicy::kRoundAwayFromZero);
+    MAYS_CHECK(centered_output.has_value());  // NOLINT(bugprone-assert-side-effect)
 
     // Shift range from zero into range.
-    const auto out_value = static_cast<Out>(centered_output + out_midpoint_);
+    const auto out_value = static_cast<Out>(centered_output.value() + out_midpoint_);
 
     // Clamp output within range.
     if (requires_out_clamp_) {

@@ -6,6 +6,7 @@
 #define MAYS_DIVIDE_ROUND_UP_H
 
 #include <limits>
+#include <optional>
 #include <type_traits>
 #include <utility>
 
@@ -18,7 +19,7 @@ namespace mays {
 // Divides |dividend| by |divisor|, returning a quotient that is rounded away from zero. This is the
 // opposite rounding behavior to normal division. This avoids the overflow in the naïve
 // implementation |(dividend + divisor - 1) / divisor| for large dividends. Often used in capacity
-// computations. Checks for divide-by-zero and signed overflow.
+// computations. Returns std::nullopt in case of divide-by-zero or signed overflow.
 //
 // Example:
 //   size_t num_bytes_needed = DivideRoundUp(num_bits, size_t{8});
@@ -32,13 +33,17 @@ namespace mays {
 //   DivideRoundUp(int8_t{1}, 1);    // OK, |1| has type int
 //   DivideRoundUp(uint8_t{1}, 1U);  // OK, |1U| has type unsigned int
 //   DivideRoundUp(uint8_t{1}, 1);   // Won't compile
-template <typename N, typename D, typename Return = decltype(std::declval<N>() / std::declval<D>())>
-[[nodiscard]] constexpr Return DivideRoundUp(N dividend, D divisor) {
+template <typename N,
+          typename D,
+          typename Quotient = decltype(std::declval<N>() / std::declval<D>())>
+[[nodiscard]] constexpr std::optional<Quotient> DivideRoundUp(N dividend, D divisor) {
   static_assert(std::is_integral_v<N> && std::is_integral_v<D>,
                 "Function is valid only for integers");
   static_assert(std::is_signed_v<N> == std::is_signed_v<D>,
                 "dividend and divisor signedness don't match");
-  MAYS_CHECK(divisor != 0);
+  if (divisor == 0) {
+    return std::nullopt;
+  }
 
   // Avoid underflowing |dividend|
   if (dividend == 0) {
@@ -47,8 +52,9 @@ template <typename N, typename D, typename Return = decltype(std::declval<N>() /
 
   if constexpr (std::is_signed_v<N>) {
     if constexpr (std::is_signed_v<D>) {
-      // NOLINTNEXTLINE(bugprone-assert-side-effect)
-      MAYS_CHECK(!(dividend == std::numeric_limits<Return>::min() && divisor == D{-1}));
+      if (dividend == std::numeric_limits<Quotient>::min() && divisor == D{-1}) {
+        return std::nullopt;
+      }
     }
 
     // ALTERNATE ALGORITHM: signed version of sliding range method that does not need remainder
