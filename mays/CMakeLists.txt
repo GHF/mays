@@ -11,6 +11,7 @@ target_sources(${PROJECT_NAME}
     nabs.h
     negate_if.h
     range_map.h
+    reduce.h
     round_policy.h
     scale.h
     sign_of.h
@@ -28,6 +29,7 @@ target_sources(${PROJECT_NAME}_tests
     nabs_test.cc
     negate_if_test.cc
     range_map_test.cc
+    reduce_test.cc
     scale_test.cc
     sign_of_test.cc
     subtract_test.cc

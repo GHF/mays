@@ -6,7 +6,6 @@
 #define MAYS_RANGE_MAP_H
 
 #include <algorithm>
-#include <numeric>
 #include <tuple>
 #include <type_traits>
 
@@ -16,6 +15,7 @@
 #include "internal/type_traits.h"
 #include "nabs.h"
 #include "negate_if.h"
+#include "reduce.h"
 #include "scale.h"
 #include "subtract.h"
 
@@ -114,8 +114,8 @@ class RangeMap final {
   constexpr Scaler<In, Intermediate, Intermediate> ComputeScaler(bool invert) {
     const auto in_width = this->in_width();
     const auto out_width = NegateIf(this->out_width(), invert);
-    const auto gcd = std::gcd(in_width, out_width);
-    return {out_width / gcd, in_width / gcd};
+    const auto [out_reduced, in_reduced] = Reduce(out_width, in_width);
+    return {out_reduced, in_reduced};
   }
 
   const In in_lo_;

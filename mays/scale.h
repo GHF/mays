@@ -24,7 +24,9 @@ namespace mays {
 // over 1) and it's difficult to determine when this will happen because scaling integers is usually
 // a precision-losing process.
 //
-// This object may be constructed as constexpr or constinit to get compile-type checking.
+// This object may be constructed as constexpr or constinit to get compile-type checking. The Reduce
+// function or std::ratio may be helpful in precomputing coprime ratios to reduce Scaler
+// intermediate value magnitudes, thereby increasing the breadth of safe inputs.
 //
 // See also MakeScaler, which can deduce the |Numerator| and |Denominator| types from arguments.
 //
