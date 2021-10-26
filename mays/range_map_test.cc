@@ -69,13 +69,14 @@ TEST_CASE("Map to an inverted range", "[range_map]") {
 }
 
 TEST_CASE("Map between ranges of various width parities", "[range_map]") {
-  const auto in_lo = GENERATE(-100, -99);
-  const auto in_hi = GENERATE(99, 100);
+  const auto in_lo = GENERATE(as<int8_t>(), -100, -99);
+  const auto in_hi = GENERATE(as<int8_t>(), 99, 100);
   const auto out_a = GENERATE(0, 1);
   const auto out_b = GENERATE(9, 10);
-  const auto deadband = GENERATE(0, 1);
+  const auto deadband = GENERATE(as<int8_t>(), 0, 1);
   const RangeMap map({in_lo, in_hi}, {out_a, out_b}, deadband);
 
+  CAPTURE(in_lo, in_hi, out_a, out_b, deadband);
   CHECK(out_a == map.Map(in_lo));
   CHECK(out_b == map.Map(in_hi));
   CHECK(Average(out_a, out_b) == map.Map(Average(in_lo, in_hi)));

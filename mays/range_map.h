@@ -115,11 +115,11 @@ class RangeMap final {
     return (in_width() % 2) || (out_width() % 2);
   }
 
-  constexpr Scaler<In, Out, In> ComputeScaler(bool invert) {
+  constexpr Scaler<In, Intermediate, Intermediate> ComputeScaler(bool invert) {
     const auto in_width = this->in_width();
     const auto out_width = NegateIf(this->out_width(), invert);
-    const Intermediate gcd = std::gcd(in_width, out_width);
-    return {static_cast<Out>(out_width / gcd), static_cast<In>(in_width / gcd)};
+    const auto gcd = std::gcd(in_width, out_width);
+    return {out_width / gcd, in_width / gcd};
   }
 
   const In in_lo_;
@@ -129,7 +129,7 @@ class RangeMap final {
   const In in_midpoint_;
   const std::tuple<Out, Out> out_range_;  // Sorted output limits.
   const Out out_midpoint_;
-  const Scaler<In, Out, In> in_to_out_scaler_;
+  const Scaler<In, Intermediate, Intermediate> in_to_out_scaler_;
   const bool requires_out_clamp_;
 };
 
