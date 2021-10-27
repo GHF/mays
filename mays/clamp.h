@@ -1,5 +1,6 @@
 // (C) Copyright 2014 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #ifndef MAYS_CLAMP_H
 #define MAYS_CLAMP_H
@@ -43,15 +44,13 @@ template <typename T, typename L, typename H, typename = std::enable_if_t<std::i
 [[nodiscard]] constexpr T Clamp(T v, L lo, H hi) {
   if constexpr (!internal::is_convertible_without_narrowing_v<L, T>) {
     static_assert(std::is_integral_v<L>, "Integer Clamp's lower bound must be an integer.");
-    // NOLINTNEXTLINE(bugprone-assert-side-effect)
     MAYS_CHECK(internal::cmp_less_equal(lo, std::numeric_limits<T>::max()));
   }
   if constexpr (!internal::is_convertible_without_narrowing_v<H, T>) {
     static_assert(std::is_integral_v<H>, "Integer Clamp's upper bound must be an integer.");
-    // NOLINTNEXTLINE(bugprone-assert-side-effect)
     MAYS_CHECK(internal::cmp_greater_equal(hi, std::numeric_limits<T>::min()));
   }
-  MAYS_CHECK(internal::cmp_less_equal(lo, hi));  // NOLINT(bugprone-assert-side-effect)
+  MAYS_CHECK(internal::cmp_less_equal(lo, hi));
   const T lower_bounded = internal::cmp_greater_equal(v, lo) ? v : T(lo);
   const T both_bounded = internal::cmp_less_equal(lower_bounded, hi) ? lower_bounded : T(hi);
   return both_bounded;

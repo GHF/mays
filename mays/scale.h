@@ -43,7 +43,6 @@ class Scaler final {
   constexpr Scaler(Numerator numerator, Denominator denominator)
       : numerator_(numerator), denominator_(denominator) {
     MAYS_CHECK(denominator_ != 0);
-    // NOLINTNEXTLINE(bugprone-assert-side-effect)
     MAYS_CHECK(is_unit_rate() || can_promote() || can_pre_divide());
   }
 

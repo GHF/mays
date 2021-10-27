@@ -74,7 +74,7 @@ class RangeMap final {
     // deadband map to 0.
     const auto centered_output =
         in_to_out_scaler_.Scale(centered_input, RoundPolicy::kRoundAwayFromZero);
-    MAYS_CHECK(centered_output.has_value());  // NOLINT(bugprone-assert-side-effect)
+    MAYS_CHECK(centered_output.has_value());
 
     // Shift range from zero into range.
     const auto out_value = static_cast<Out>(centered_output.value() + out_midpoint_);
@@ -96,14 +96,14 @@ class RangeMap final {
     MAYS_CHECK(in_lo_ < in_hi_);
     MAYS_CHECK(deadband_ >= 0);
     auto width = SubtractInto<Intermediate>(in_hi_, in_lo_);
-    MAYS_CHECK(width.has_value());              // NOLINT(bugprone-assert-side-effect)
-    MAYS_CHECK(width.value() > 2 * deadband_);  // NOLINT(bugprone-assert-side-effect)
+    MAYS_CHECK(width.has_value());
+    MAYS_CHECK(width.value() > 2 * deadband_);
     return width.value() - 2 * deadband_;
   }
 
   constexpr Intermediate out_width() const {
     auto width = SubtractInto<Intermediate>(std::get<1>(out_range_), std::get<0>(out_range_));
-    MAYS_CHECK(width.has_value());  // NOLINT(bugprone-assert-side-effect)
+    MAYS_CHECK(width.has_value());
     return width.value();
   }
 
