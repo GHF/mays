@@ -10,8 +10,10 @@
 #include <optional>
 #include <type_traits>
 
+#include "add.h"
 #include "divide.h"
 #include "internal/check.h"
+#include "multiply.h"
 #include "nabs.h"
 
 namespace mays {
@@ -50,21 +52,34 @@ class Scaler final {
       RoundPolicy round_policy = RoundPolicy::kRoundTowardZero) const {
     // Optimize out the division if possible.
     if (is_unit_rate()) {
-      return in * (numerator_ * denominator_);
+      return MultiplyInto<Out>(in, (Intermediate{numerator_} * denominator_));
     }
 
     // For types smaller than int, let promotion do the work.
     if constexpr (can_promote()) {
-      return Divide<Intermediate, Intermediate>(round_policy, in * numerator_, denominator_);
+      if (const std::optional result = Divide<Intermediate, Intermediate>(
+              round_policy, Intermediate{in} * numerator_, denominator_);
+          result.has_value()) {
+        // |Intermediate| and |Out| have the same signedness so a roundtrip conversion is sufficient
+        // to determine if |result| is in range of |Out|.
+        if (result.value() == static_cast<Out>(result.value())) {
+          return result;
+        }
+      }
+      return std::nullopt;
     } else {
       MAYS_CHECK(can_pre_divide());
       const Intermediate quotient = in / denominator_;
       const Intermediate remainder = in % denominator_;
-      const auto scaled_remainder = Divide(round_policy, remainder * numerator_, denominator_);
-      if (!scaled_remainder.has_value()) {
-        return std::nullopt;
+      if (const std::optional scaled_remainder =
+              Divide(round_policy, remainder * numerator_, denominator_);
+          scaled_remainder.has_value()) {
+        if (const std::optional scaled_quotient = Multiply(quotient, numerator_);
+            scaled_quotient.has_value()) {
+          return AddInto<Out>(scaled_quotient.value(), scaled_remainder.value());
+        }
       }
-      return quotient * numerator_ + scaled_remainder.value();
+      return std::nullopt;
     }
   }
 

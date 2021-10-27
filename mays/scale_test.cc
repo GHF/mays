@@ -114,7 +114,7 @@ TEST_CASE("Scale value by an integer unit rate", "[scale]") {
 }
 
 TEST_CASE("Scale doesn't overflow int8_t naively", "[scale]") {
-  // 107 * 11 would overflow past std::numeric_limits<int8_t>::max()
+  // 109 * 12 would overflow past std::numeric_limits<int8_t>::max()
   const auto [result, x] = GENERATE(table<int, int8_t>({{118, 109}, {127, 117}}));
   const int8_t numerator = 12;
   const int8_t denominator = 11;
@@ -127,7 +127,7 @@ TEST_CASE("Scale doesn't overflow int8_t naively", "[scale]") {
 }
 
 TEST_CASE("Scale doesn't overflow uint8_t naively", "[scale]") {
-  // 107 * 11 would overflow past std::numeric_limits<int8_t>::max()
+  // 229 * 12 would overflow past std::numeric_limits<uint8_t>::max()
   const auto [result, x] = GENERATE(table<unsigned int, uint8_t>({{249, 229}, {255, 234}}));
   const uint8_t numerator = 12;
   const uint8_t denominator = 11;
@@ -147,6 +147,42 @@ TEST_CASE("Scale has no restrictions on types smaller than int", "[scale]") {
 // NOLINTNEXTLINE
 TEMPLATE_TEST_CASE("Scale can handle ratio 0/1", "[scale]", int, unsigned) {
   CHECK(0 == Scale<TestType, TestType, TestType>(1, 0, 1));
+}
+
+TEST_CASE("Scale returns nullopt for signed overflow", "[scale]") {
+  SECTION("Unit rate branch") {
+    constexpr auto scaler = MakeScaler<int32_t>(-int32_t(1 << 16), -1);
+    CHECK(-int32_t{1 << 31} == scaler.Scale(-int32_t{1 << 15}));
+    CHECK(!scaler.Scale(-int32_t{1 << 16}).has_value());
+  }
+
+  {  // Degenerate scaling value (almost not representable)
+    constexpr auto scaler = MakeScaler<int>(std::numeric_limits<int>::min(), -1);
+    REQUIRE(0 == scaler.Scale(0));
+    SECTION("Degenerate scale rejects non-zero inputs") {
+      const int value = GENERATE(take(
+          100, filter([](int i) { return i != 0; },
+                      random(std::numeric_limits<int>::min(), std::numeric_limits<int>::max()))));
+      CHECK(!scaler.Scale(value).has_value());
+    }
+  }
+
+  SECTION("Promotion branch") {
+    constexpr auto scaler = MakeScaler<int8_t>(int8_t{-128}, int8_t{1});
+    CHECK(!scaler.Scale(-1).has_value());
+  }
+
+  SECTION("Main branch") {
+    constexpr auto scaler = MakeScaler<int>(std::numeric_limits<int>::min() / 2 + 1, 3);
+    // Even if the scaler pre-divides the input (i.e. 9 / 3 = 3), the quotient multiplied by the
+    // numerator immediately exceeds integer limits.
+    CHECK(!scaler.Scale(9).has_value());
+
+    // If scaler pre-divides the input (i.e. 8 / 3 = 2), the quotient multiplied by the numerator is
+    // still within integer limit, so it's the sum with the scaled remainder that makes this
+    // overflow.
+    CHECK(!scaler.Scale(8).has_value());
+  }
 }
 
 }  // namespace
