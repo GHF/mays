@@ -1,5 +1,6 @@
 // (C) Copyright 2020 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #include "check.h"
 
@@ -54,6 +55,12 @@ TEST_CASE_METHOD(CheckFixture, "Check false condition calls custom handler", "[i
   CHECK(handler_called());
   REQUIRE(condition().has_value());
   CHECK_THAT(*condition(), Equals("1 == 2"));
+}
+
+TEST_CASE_METHOD(CheckFixture, "Check condition can use names from binding", "[internal/assert]") {
+  const int kArray[] = {0, 0};
+  const auto [a, b] = kArray;
+  MAYS_CHECK(a == b);
 }
 
 }  // namespace

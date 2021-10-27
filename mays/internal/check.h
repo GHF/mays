@@ -25,12 +25,12 @@
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define MAYS_CHECK(condition)                                                                   \
-  [&] {                                                                                         \
+  do {                                                                                          \
     static_assert(std::is_same_v<decltype(condition), bool>,                                    \
                   "Condition expression must be type bool, not just convertible to type bool. " \
                   "Example: MAYS_CHECK(ptr != nullptr) instead of MAYS_CHECK(ptr)");            \
     if (!(condition))                                                                           \
       MAYS_ATTRIBUTE_UNLIKELY { MAYS_HANDLE_CHECK_FAILURE(#condition); }                        \
-  }()
+  } while (false)
 
 #endif  // MAYS_INTERNAL_CHECK_H
