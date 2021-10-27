@@ -20,6 +20,7 @@ if(TOP_LEVEL_PROJECT)
     Catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
     GIT_TAG        v2.13.7)
+  SET(CATCH_BUILD_STATIC_LIBRARY ON CACHE BOOL "Build Catch2 main")
   FetchContent_MakeAvailable(Catch2)
 
   # Make include directories be included as system headers to avoid clang-tidy diagnostics
@@ -29,13 +30,11 @@ if(TOP_LEVEL_PROJECT)
 
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
   set(TEST_NAME ${PROJECT_NAME}_tests)
-  add_executable(${TEST_NAME}
-    catch2_main.cc
-  )
+  add_executable(${TEST_NAME})
   target_link_libraries(${TEST_NAME}
     PRIVATE
       mays
-      Catch2::Catch2
+      Catch2::Catch2WithMain
   )
   target_compile_options(${TEST_NAME}
     PRIVATE
