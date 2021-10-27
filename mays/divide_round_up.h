@@ -60,12 +60,14 @@ template <typename N,
     // ALTERNATE ALGORITHM: signed version of sliding range method that does not need remainder
     if (false) {  // NOLINT(readability-simplify-boolean-expr)
       const bool quotient_positive = ((dividend > 0) == (divisor > 0));
-      return (dividend - SignOf(dividend)) / divisor + (quotient_positive ? 1 : -1);
+      return Quotient{dividend - SignOf(dividend)} / Quotient{divisor} +
+             (quotient_positive ? 1 : -1);
     }
 
     // For signed numbers, quotient is negative iff only one of operands is negative, but remainder
     // takes sign of dividend. Take the divisor's sign into account when rounding up.
-    return dividend / divisor + NegateIf(SignOf(dividend % divisor), divisor < 0);
+    return Quotient{dividend} / Quotient{divisor} +
+           NegateIf(SignOf(dividend % divisor), divisor < 0);
   }
 
   // By diminishing |dividend|, exact quotients are decreased by one and non-exact quotients remain

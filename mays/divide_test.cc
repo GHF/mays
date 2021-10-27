@@ -34,8 +34,14 @@ TEST_CASE("Divide computes quotient based on RoundPolicy", "[divide]") {
 TEST_CASE("Divide returns nullopt for divide-by-zero and overflow", "[divide]") {
   const RoundPolicy round_policy = GENERATE(
       RoundPolicy::kRoundTowardZero, RoundPolicy::kRoundToNearest, RoundPolicy::kRoundAwayFromZero);
+  CAPTURE(round_policy);
   CHECK(!Divide(round_policy, std::numeric_limits<int>::min(), -1).has_value());
   CHECK(!Divide(round_policy, 1, 0).has_value());
+
+  // Check for overflow against a specific type
+  CHECK(128 == DivideInto<int>(round_policy, int8_t{-128}, int8_t{-1}));
+  CHECK(std::numeric_limits<int>::max() + int64_t{1} ==
+        DivideInto<int64_t>(round_policy, std::numeric_limits<int>::min(), -1).value_or(0));
 }
 
 }  // namespace

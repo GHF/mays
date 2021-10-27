@@ -18,6 +18,8 @@ namespace mays {
 
 // Computes the quotient of a pair of number using the RoundPolicy specified.
 // Returns std::nullopt in case of divide-by-zero or signed overflow.
+//
+// TODO(xw): Handle dividing mixed case types
 template <typename N,
           typename D,
           typename Quotient = decltype(std::declval<N>() / std::declval<D>())>
@@ -33,12 +35,25 @@ template <typename N,
         return std::nullopt;
       }
     }
-    return dividend / divisor;
+    return Quotient{dividend} / Quotient{divisor};
   }
   if (round_policy == RoundPolicy::kRoundToNearest) {
-    return DivideRoundNearest(dividend, divisor);
+    return DivideRoundNearest<N, D, Quotient>(dividend, divisor);
   }
-  return DivideRoundUp(dividend, divisor);
+  return DivideRoundUp<N, D, Quotient>(dividend, divisor);
+}
+
+// Shorthand to perform addition on operands whose types are deduced then check for overflow against
+// a specific explicitly-provided type.
+//
+// Example:
+//   const std::optional quotient = DivideInto<int>(int8_t{-128}, int8_t{-1});
+// |quotient| contains int{128} without overflow.
+template <typename Quotient, typename N, typename D>
+[[nodiscard]] constexpr std::optional<Quotient> DivideInto(RoundPolicy round_policy,
+                                                           N dividend,
+                                                           D divisor) {
+  return Divide<N, D, Quotient>(round_policy, dividend, divisor);
 }
 
 }  // namespace mays

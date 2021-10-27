@@ -45,7 +45,6 @@ template <typename N,
     return std::nullopt;
   }
 
-  using QuotientT = decltype(dividend / divisor);
   if constexpr (std::is_signed_v<N>) {
     if constexpr (std::is_signed_v<D>) {
       if (dividend == std::numeric_limits<Quotient>::min() && divisor == D{-1}) {
@@ -56,12 +55,12 @@ template <typename N,
     // Same algorithm as for unsigned but remainder and half-divisor are mapped to negative values
     // with Nabs to easily compare them
     const bool quotient_positive = ((dividend > 0) == (divisor > 0));
-    const QuotientT round_away = Nabs(dividend % divisor) < (Nabs(divisor) + 1) / 2;
-    return dividend / divisor - NegateIf(round_away, quotient_positive);
+    const Quotient round_away = Nabs(dividend % divisor) < (Nabs(divisor) + 1) / 2;
+    return Quotient{dividend} / Quotient{divisor} - NegateIf(round_away, quotient_positive);
   }
 
   // Equals one if the remainder is greater than or equal to half of divisor
-  const QuotientT round_up = dividend % divisor > (divisor - 1) / 2;
+  const Quotient round_up = dividend % divisor > (divisor - 1) / 2;
   return dividend / divisor + round_up;
 }
 
