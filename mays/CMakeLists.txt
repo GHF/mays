@@ -2,12 +2,14 @@ add_subdirectory(internal)
 
 target_sources(${PROJECT_NAME}
   INTERFACE
+    add.h
     array_size.h
     average.h
     clamp.h
     divide.h
     divide_round_up.h
     divide_round_nearest.h
+    multiply.h
     nabs.h
     negate_if.h
     range_map.h
@@ -20,12 +22,14 @@ target_sources(${PROJECT_NAME}
 
 target_sources(${PROJECT_NAME}_tests
   PRIVATE
+    add_test.cc
     array_size_test.cc
     average_test.cc
     clamp_test.cc
     divide_test.cc
     divide_round_up_test.cc
     divide_round_nearest_test.cc
+    multiply_test.cc
     nabs_test.cc
     negate_if_test.cc
     range_map_test.cc

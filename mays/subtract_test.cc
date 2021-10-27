@@ -22,6 +22,11 @@ TEST_CASE("Subtract checks for overflow", "[subtract]") {
 
 TEST_CASE("SubtractInto checks for overflow against a specific type", "[subtract]") {
   CHECK(-137 == SubtractInto<int>(int8_t{-10}, int8_t{127}));
+
+  // Mixed signs work but observes normal C rules for promotion and needs this coercion to produce
+  // negative differences.
+  CHECK(!Subtract(1, 2U).has_value());
+  CHECK(-1 == SubtractInto<int>(1, 2U));
 }
 
 }  // namespace
