@@ -33,7 +33,7 @@ template <typename M, typename S, typename Difference = std::common_type_t<M, S>
 // against a specific explicitly-provided type.
 //
 // Example:
-//   const std::optional<int> difference = SubtractInto<int>(int8_t{-10}, int8_t{127});
+//   const std::optional difference = SubtractInto<int>(int8_t{-10}, int8_t{127});
 // |difference| contains int{-137} without overflow.
 template <typename Difference, typename M, typename S>
 [[nodiscard]] constexpr std::optional<Difference> SubtractInto(M minuend, S subtrahend) {

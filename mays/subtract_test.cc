@@ -20,5 +20,9 @@ TEST_CASE("Subtract checks for overflow", "[subtract]") {
   CHECK(c == Subtract(a, b));
 }
 
+TEST_CASE("SubtractInto checks for overflow against a specific type", "[subtract]") {
+  CHECK(-137 == SubtractInto<int>(int8_t{-10}, int8_t{127}));
+}
+
 }  // namespace
 }  // namespace mays
