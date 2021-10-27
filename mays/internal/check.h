@@ -1,5 +1,6 @@
 // (C) Copyright 2020 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #ifndef MAYS_INTERNAL_CHECK_H
 #define MAYS_INTERNAL_CHECK_H
@@ -16,7 +17,8 @@
 #if __cplusplus < 202002L
 #pragma clang diagnostic ignored "-Wc++20-extensions"
 #endif  // __cplusplus < 202002L
-#define MAYS_ATTRIBUTE_UNLIKELY [[unlikely]]  // NOLINT(cppcoreguidelines-macro-usage)
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define MAYS_ATTRIBUTE_UNLIKELY [[unlikely]]
 #else
 #define MAYS_ATTRIBUTE_UNLIKELY
 #endif  // __has_cpp_attribute(unlikely)
