@@ -26,7 +26,7 @@ namespace mays {
 //
 // Example:
 //   constexpr RangeMap map(/*in_range=*/{int8_t{-127}, int8_t{127}},
-//                          /*out_ends*/{1000, 2000},
+//                          /*out_ends=*/{1000, 2000},
 //                          /*deadband=*/int8_t{10});
 //   const int kMapped = map.Map(11);  // kMapped = 1505
 template <typename In, typename Out>
