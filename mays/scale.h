@@ -43,6 +43,13 @@ class Scaler final {
   constexpr Scaler(Numerator numerator, Denominator denominator)
       : numerator_(numerator), denominator_(denominator) {
     MAYS_CHECK(denominator_ != 0);
+    if constexpr (std::is_signed_v<Intermediate>) {
+      // Degenerate ratio that—while representing a real, large scale—can only scale the value 0
+      // without overflow in practice anyways. This would be handled by the fast unit rate branch,
+      // which would have to deal with this case and input value 1 specially to avoid returning an
+      // incorrect result.
+      MAYS_CHECK(numerator_ != std::numeric_limits<Intermediate>::min() || denominator_ != -1);
+    }
     MAYS_CHECK(is_unit_rate() || can_promote() || can_pre_divide());
   }
 

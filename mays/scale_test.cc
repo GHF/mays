@@ -156,17 +156,6 @@ TEST_CASE("Scale returns nullopt for signed overflow", "[scale]") {
     CHECK(!scaler.Scale(-int32_t{1 << 16}).has_value());
   }
 
-  {  // Degenerate scaling value (almost not representable)
-    constexpr auto scaler = MakeScaler<int>(std::numeric_limits<int>::min(), -1);
-    REQUIRE(0 == scaler.Scale(0));
-    SECTION("Degenerate scale rejects non-zero inputs") {
-      const int value = GENERATE(take(
-          100, filter([](int i) { return i != 0; },
-                      random(std::numeric_limits<int>::min(), std::numeric_limits<int>::max()))));
-      CHECK(!scaler.Scale(value).has_value());
-    }
-  }
-
   SECTION("Promotion branch") {
     constexpr auto scaler = MakeScaler<int8_t>(int8_t{-128}, int8_t{1});
     CHECK(!scaler.Scale(-1).has_value());
