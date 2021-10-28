@@ -1,5 +1,6 @@
 // (C) Copyright 2014 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #ifndef MAYS_AVERAGE_H
 #define MAYS_AVERAGE_H
@@ -38,14 +39,15 @@ template <typename T>
     const T round_to_zero = (sum_halves < 0) & (a ^ b);
     // Result is sum of halves corrected for rounding.
     return sum_halves + both_odd + round_to_zero;
+  } else {
+    // Use a (maybe) more compiler-friendly form for unsigned integers, where the absolute
+    // difference of a and b will always be in range.
+    auto avg_of = [](T x, T y) { return x + (y - x) / 2; };
+    if (a > b) {
+      return avg_of(b, a);
+    }
+    return avg_of(a, b);
   }
-
-  // Use a more compiler-friendly form for unsigned integers, where the absolute difference of a and
-  // b will always be in range.
-  if (a > b) {
-    return Average(b, a);
-  }
-  return a + (b - a) / 2;
 }
 
 }  // namespace mays
