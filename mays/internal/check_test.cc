@@ -60,7 +60,7 @@ TEST_CASE_METHOD(CheckFixture, "Check false condition calls custom handler", "[i
 TEST_CASE_METHOD(CheckFixture, "Check condition can use names from binding", "[internal/assert]") {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
   const int kArray[] = {0, 0};
-  const auto [a, b] = kArray;
+  const auto [a, b] = kArray;  // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
   MAYS_CHECK(a == b);
 }
 
