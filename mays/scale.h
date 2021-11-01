@@ -139,6 +139,14 @@ template <typename T, typename N, typename D>
   return {numerator, denominator};
 }
 
+// Create a Scaler whose |Numerator| and |Denominator| types are deduced from the two-member
+// decomposable type (e.g. std::tuple, std::pair, struct { int num; int den; }, etc) passed to it.
+template <typename T, typename Tuple>
+[[nodiscard]] constexpr auto MakeScaler(const Tuple& ratio) {
+  const auto [numerator, denominator] = ratio;
+  return MakeScaler<T>(numerator, denominator);
+}
+
 // Multiplies a value |x| against a ratio of |numerator| over |denominator| while maintaining
 // precision and avoiding unnecessary overflow. Results that are not integers will be rounded
 // per |round_policy|.

@@ -174,5 +174,15 @@ TEST_CASE("Scale returns nullopt for signed overflow", "[scale]") {
   }
 }
 
+TEST_CASE("MakeScaler accepts tuple and pair as a ratio", "[scale]") {
+  static_cast<void>(MakeScaler<int16_t>(std::pair(4, 64)));
+  static_cast<void>(MakeScaler<int16_t>(std::tuple(4, 64)));
+  constexpr struct {
+    int num;
+    int den;
+  } kStructRatio = {4, 64};
+  static_cast<void>(MakeScaler<int16_t>(kStructRatio));
+}
+
 }  // namespace
 }  // namespace mays
