@@ -17,5 +17,15 @@ TEST_CASE("Reduce simplifies numbers by their GCD", "[reduce]") {
   CHECK(5 * 7 == c);
 }
 
+TEST_CASE("Reduce unpacks and simplifies a tuple", "[reduce]") {
+  constexpr std::tuple input(int8_t{2 * 3 * 3}, 2 * 3 * 5, 3 * 5 * 7);
+  constexpr std::tuple reduced = Reduce(input);
+  static_assert(std::is_same_v<decltype(input), decltype(reduced)>);
+  const auto [a, b, c] = reduced;
+  CHECK(2 * 3 == a);
+  CHECK(2 * 5 == b);
+  CHECK(5 * 7 == c);
+}
+
 }  // namespace
 }  // namespace mays
