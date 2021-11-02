@@ -18,11 +18,12 @@ jobs:
       run: mkdir clang-tidy-result
     - name: Run analysis
       run: |
-        git diff -U1 HEAD^ | clang-tidy-diff.py -p1 -path build -export-fixes clang-tidy-result/fixes.yml
+        git diff -U1 HEAD^ | clang-tidy-diff -p1 -path build -export-fixes clang-tidy-result/fixes.yml
     - name: Run clang-tidy-pr-comments action
       uses: platisd/clang-tidy-pr-comments@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        clang_tidy_fixes: clang-tidy-result/fixes.yml
         request_changes: true
         suggestions_per_comment: 10
 

@@ -9,7 +9,6 @@ namespace mays {
 namespace {
 
 TEST_CASE("Deduce array size", "[array_size]") {
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
   int a[2];
   static_assert(2 == ArraySize(a));
   static_assert(2 == ArraySize<0>(a));
