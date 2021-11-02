@@ -67,7 +67,7 @@ class RangeMap final {
     if (Nabs(centered_input) > -deadband_) {
       centered_input = 0;
     } else {
-      centered_input -= SignOf(centered_input) * deadband_;
+      centered_input -= static_cast<In>(SignOf(centered_input) * deadband_);
     }
 
     // Scale by output to input ratio. Round away from 0 so that values immediately outside of the

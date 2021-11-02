@@ -152,7 +152,7 @@ TEMPLATE_TEST_CASE("Scale can handle ratio 0/1", "[scale]", int, unsigned) {
 TEST_CASE("Scale returns nullopt for signed overflow", "[scale]") {
   SECTION("Unit rate branch") {
     constexpr auto scaler = MakeScaler<int32_t>(-int32_t(1 << 16), -1);
-    CHECK(-int32_t{1 << 31} == scaler.Scale(-int32_t{1 << 15}));
+    CHECK(std::numeric_limits<int32_t>::min() == scaler.Scale(-int32_t{1 << 15}));
     CHECK(!scaler.Scale(-int32_t{1 << 16}).has_value());
   }
 

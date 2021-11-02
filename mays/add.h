@@ -22,7 +22,7 @@ namespace mays {
 //   const uint8_t saturated_x_sum = Add(int8_t{100}, int8_t{x}).value_or(127);
 template <typename A0, typename A1, typename Sum = std::common_type_t<A0, A1>>
 [[nodiscard]] constexpr std::optional<Sum> Add(A0 addend0, A1 addend1) {
-  Sum result;
+  Sum result{};
   if (__builtin_add_overflow(addend0, addend1, &result)) {
     return std::nullopt;
   }

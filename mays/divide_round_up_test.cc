@@ -3,7 +3,7 @@
 
 #include "divide_round_up.h"
 
-#include <cstddef>
+#include <climits>
 #include <limits>
 
 #include <catch2/catch.hpp>

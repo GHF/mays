@@ -22,7 +22,7 @@ namespace mays {
 //   uint8_t saturated_x_product = Multiply(int8_t{2}, int8_t{x}).value_or(x > 0 ? 127 : -128);
 template <typename M0, typename M1, typename Product = std::common_type_t<M0, M1>>
 [[nodiscard]] constexpr std::optional<Product> Multiply(M0 multiplicand, M1 multiplier) {
-  Product result;
+  Product result{};
   if (__builtin_mul_overflow(multiplicand, multiplier, &result)) {
     return std::nullopt;
   }

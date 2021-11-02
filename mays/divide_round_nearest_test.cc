@@ -3,7 +3,7 @@
 
 #include "divide_round_nearest.h"
 
-#include <cstddef>
+#include <climits>
 #include <limits>
 
 #include <catch2/catch.hpp>

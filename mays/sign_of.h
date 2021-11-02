@@ -1,5 +1,6 @@
 // (C) Copyright 2014 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #ifndef MAYS_SIGN_OF_H
 #define MAYS_SIGN_OF_H
@@ -20,7 +21,7 @@ namespace mays {
 template <typename T>
 [[nodiscard]] constexpr T SignOf(T i) {
   static_assert(std::is_integral_v<T>, "Function is valid only for integers");
-  return (i > 0) - (i < 0);
+  return static_cast<T>((i > 0) - (i < 0));
 }
 
 }  // namespace mays

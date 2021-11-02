@@ -22,7 +22,7 @@ namespace mays {
 //   const uint8_t saturated_x_difference = Subtract(uint8_t{10}, uint8_t{x}).value_or(0);
 template <typename M, typename S, typename Difference = std::common_type_t<M, S>>
 [[nodiscard]] constexpr std::optional<Difference> Subtract(M minuend, S subtrahend) {
-  Difference result;
+  Difference result{};
   if (__builtin_sub_overflow(minuend, subtrahend, &result)) {
     return std::nullopt;
   }

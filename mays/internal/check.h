@@ -14,9 +14,11 @@
 #endif  // MAYS_HANDLE_CHECK_FAILURE
 
 #if __has_cpp_attribute(unlikely)
+#if defined(__clang__)
 #if __cplusplus < 202002L
 #pragma clang diagnostic ignored "-Wc++20-extensions"
 #endif  // __cplusplus < 202002L
+#endif  // defined(__clang__)
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define MAYS_ATTRIBUTE_UNLIKELY [[unlikely]]
 #else

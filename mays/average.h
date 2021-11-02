@@ -36,9 +36,9 @@ template <typename T>
     // This has error of magnitude one if both are odd.
     const T both_odd = (a & b) & 1;
     // Round toward zero; add one if one input is odd and sum is negative.
-    const T round_to_zero = (sum_halves < 0) & (a ^ b);
+    const T round_to_zero = T{sum_halves < 0} & (a ^ b);
     // Result is sum of halves corrected for rounding.
-    return sum_halves + both_odd + round_to_zero;
+    return static_cast<T>(sum_halves + both_odd + round_to_zero);
   } else {
     // Use a (maybe) more compiler-friendly form for unsigned integers, where the absolute
     // difference of a and b will always be in range.
