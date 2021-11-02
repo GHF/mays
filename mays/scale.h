@@ -69,7 +69,7 @@ class Scaler final {
         // |Intermediate| and |Out| have the same signedness so a roundtrip conversion is sufficient
         // to determine if |result| is in range of |Out|.
         if (result.value() == static_cast<Out>(result.value())) {
-          return result;
+          return result.value();
         }
       }
       return std::nullopt;

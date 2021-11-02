@@ -146,7 +146,7 @@ TEST_CASE("Scale has no restrictions on types smaller than int", "[scale]") {
 
 // NOLINTNEXTLINE
 TEMPLATE_TEST_CASE("Scale can handle ratio 0/1", "[scale]", int, unsigned) {
-  CHECK(0 == Scale<TestType, TestType, TestType>(1, 0, 1));
+  static_assert(0 == Scale<TestType, TestType, TestType>(1, 0, 1));
 }
 
 TEST_CASE("Scale returns nullopt for signed overflow", "[scale]") {
@@ -181,7 +181,8 @@ TEST_CASE("MakeScaler accepts tuple and pair as a ratio", "[scale]") {
     int num;
     int den;
   } kStructRatio = {4, 64};
-  static_cast<void>(MakeScaler<int16_t>(kStructRatio));
+  constexpr Scaler scaler = MakeScaler<int16_t>(kStructRatio);
+  [[maybe_unused]] constexpr std::optional value = scaler.Scale(0);
 }
 
 }  // namespace
