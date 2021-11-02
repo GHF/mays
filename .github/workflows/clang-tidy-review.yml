@@ -1,0 +1,29 @@
+name: clang-tidy-review
+on: pull_request
+jobs:
+  static-analysis:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '2'
+    - name: Install clang-tidy
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-tidy
+    - name: Prepare compile_commands.json
+      run: cmake -B ${{github.workspace}}/build
+    - name: Create results directory
+      run: mkdir clang-tidy-result
+    - name: Run analysis
+      run: |
+        git diff -U1 HEAD^ | clang-tidy-diff -p1 -path build -export-fixes clang-tidy-result/fixes.yml
+    - name: Run clang-tidy-pr-comments action
+      uses: platisd/clang-tidy-pr-comments@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        clang_tidy_fixes: clang-tidy-result/fixes.yml
+        request_changes: true
+        suggestions_per_comment: 10
+
