@@ -46,7 +46,9 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: ctest -C ${{env.BUILD_TYPE}}
+      # Coverage processing seems to be broken when run through ctest
+      # run: ctest -C ${{env.BUILD_TYPE}}
+      run: ./mays_tests --use-colour=yes
 
     - name: Process coverage data
       if: matrix.compiler.COVERAGE == 'ON'
