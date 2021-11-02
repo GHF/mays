@@ -15,6 +15,11 @@ target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
 
 # Build unit tests when built standalone
 if(TOP_LEVEL_PROJECT)
+  option(CODE_COVERAGE "Enable coverage reporting (Clang only)" OFF)
+  if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "(Apple)?Clang")
+    set(code_cov_options -fprofile-instr-generate -fcoverage-mapping)
+  endif()
+
   include(FetchContent)
   FetchContent_Declare(
     Catch2
@@ -43,6 +48,11 @@ if(TOP_LEVEL_PROJECT)
       # Force color diagnostics output
       $<$<CXX_COMPILER_ID:GNU>:-fdiagnostics-color=always>
       $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-fcolor-diagnostics>
+      ${code_cov_options}
+  )
+  target_link_options(${TEST_NAME}
+    PRIVATE
+      ${code_cov_options}
   )
 
   enable_testing()
