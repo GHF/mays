@@ -1,5 +1,9 @@
 🧮 mays 🌽
 ==========
+![Tests](https://github.com/GHF/mays/actions/workflows/unit_tests.yml/badge.svg?branch=dev)
+![Formatting](https://github.com/GHF/mays/actions/workflows/clang-format-check.yml/badge.svg?branch=dev)
+![Static analysis](https://github.com/GHF/mays/actions/workflows/clang-tidy-push.yml/badge.svg?branch=dev)
+
 `mays` is a well-tested header-only collection of “safe-ish” C++ integer math routines intended for
 GNU-compatible compilers (Clang and GCC). They are intended to help coders avoid subtle machine and
 C/C++ arithmetic pitfalls, as well as perform compile-time safety checks and precomputation with
