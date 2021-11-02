@@ -1,0 +1,20 @@
+name: clang-tidy-push
+on: push
+env:
+  CLANG_TIDY_VERSION: 12
+jobs:
+  static-analysis:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install clang-tidy
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-tidy-${{env.CLANG_TIDY_VERSION}}
+    - name: Prepare compile_commands.json
+      run: |
+        cmake -B ${{github.workspace}}/build
+        ln -s ${{github.workspace}}/build/compile_commands.json ${{github.workspace}}
+    - name: Run analysis
+      run: clang-tidy-${{env.CLANG_TIDY_VERSION}} mays/{,**/}*.{cc,h}
