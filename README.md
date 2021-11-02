@@ -23,22 +23,23 @@ that scales `int16_t` values at compile time:
 constexpr std::tuple ratio = mays::Reduce(int16_t{51}, int16_t{114});
 
 // Construct a Scaler that operates on int16_t values using |ratio|.
-// Because this is marked constexpr, if the ratio can overflow the scaling computation then this
-// will fail to compile.
+// Because this is marked constexpr, if the ratio can overflow the scaling
+// computation then this will fail to compile.
 constexpr mays::Scaler scaler = mays::MakeScaler<int16_t>(ratio);
 
-// This performs a scaling operation on the value 30000. The return type is std::optional<int16_t>
-// to represent the possibility of overflow when scaling up numbers. The ratio here is ≤ 1 so
-// overflow is not possible.
+// This performs a scaling operation on the value 30000. The return type is
+// std::optional<int16_t> to represent the possibility of overflow when
+// scaling up numbers. The ratio here is ≤ 1 so overflow is not possible.
 constexpr std::optional value = scaler.Scale(int16_t{30'000});
 static_assert(value == 13'421);
 
 // It's also possible to use a different rounding policy.
-static_assert(scaler.Scale(int16_t{30'000}, mays::RoundPolicy::kRoundAwayFromZero) == 13'422);
+static_assert(scaler.Scale(int16_t{30'000},
+                           mays::RoundPolicy::kRoundAwayFromZero) == 13'422);
 
-// |scaler| can be used on values not known at compile-time, e.g. if you're building a viewport
-// resizing function:
-std::function<int16_t(int16_t)> get_resized_dimension = [scaler] (int16_t dim) {
+// |scaler| can be used on values not known at compile time, e.g. if you're
+// building a viewport resizing function:
+std::function<int16_t(int16_t)> get_resized_dimension = [scaler](int16_t dim) {
   return scaler.Scale(dim).value();
 };
 ```

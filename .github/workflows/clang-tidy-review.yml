@@ -26,4 +26,3 @@ jobs:
         clang_tidy_fixes: clang-tidy-result/fixes.yml
         request_changes: true
         suggestions_per_comment: 10
-
