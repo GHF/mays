@@ -1,6 +1,7 @@
 🧮 mays 🌽
 ==========
 ![Tests](https://github.com/GHF/mays/actions/workflows/unit_tests.yml/badge.svg?branch=dev)
+[![Coverage](https://codecov.io/gh/GHF/mays/branch/dev/graph/badge.svg?token=Q34FIKR6FN)](https://codecov.io/gh/GHF/mays)
 ![Formatting](https://github.com/GHF/mays/actions/workflows/clang-format-check.yml/badge.svg?branch=dev)
 ![Static analysis](https://github.com/GHF/mays/actions/workflows/clang-tidy-push.yml/badge.svg?branch=dev)
 
