@@ -67,7 +67,7 @@ template <typename N,
     // For signed numbers, quotient is negative iff only one of operands is negative, but remainder
     // takes sign of dividend. Take the divisor's sign into account when rounding up.
     return Quotient{dividend} / Quotient{divisor} +
-           NegateIf(SignOf(dividend % divisor), divisor < 0);
+           NegateIf(SignOf(Quotient{dividend} % Quotient{divisor}), divisor < 0);
   }
 
   // By diminishing |dividend|, exact quotients are decreased by one and non-exact quotients remain

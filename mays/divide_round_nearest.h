@@ -55,7 +55,8 @@ template <typename N,
     // Same algorithm as for unsigned but remainder and half-divisor are mapped to negative values
     // with Nabs to easily compare them
     const bool quotient_positive = ((dividend > 0) == (divisor > 0));
-    const Quotient round_away = Nabs(dividend % divisor) < (Nabs(divisor) + 1) / 2;
+    const Quotient round_away =
+        Nabs(Quotient{dividend} % Quotient{divisor}) < (Nabs(divisor) + 1) / 2;
     return Quotient{dividend} / Quotient{divisor} - NegateIf(round_away, quotient_positive);
   }
 
