@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         compiler:
-          - { name: GCC, CC: gcc, CXX: g++, VERSION: 11 }
-          - { name: Clang, CC: clang, CXX: clang++, VERSION: 13 }
+          - { name: GCC, CC: gcc, CXX: g++, VERSION: 11, COVERAGE: OFF }
+          - { name: Clang, CC: clang, CXX: clang++, VERSION: 13, COVERAGE: ON }
 
     steps:
     - uses: actions/checkout@v2
@@ -39,7 +39,7 @@ jobs:
          echo "CXX=${{ matrix.compiler.CXX }}-${{ matrix.compiler.VERSION }}" >> $GITHUB_ENV
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCODE_COVERAGE=${{ matrix.compiler.COVERAGE }}
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
@@ -47,3 +47,16 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: Process coverage data
+      if: matrix.compiler.COVERAGE == 'ON'
+      working-directory: ${{github.workspace}}/build
+      run: |
+        llvm-profdata-${{ matrix.compiler.VERSION }} merge -sparse default.profraw -o coverage.profdata
+        llvm-cov-${{ matrix.compiler.VERSION }} show ./mays_tests -instr-profile=coverage.profdata > coverage.txt
+
+    - name: Upload coverage data to Codecov
+      uses: codecov/codecov-action@v2
+      if: matrix.compiler.COVERAGE == 'ON'
+      with:
+        files: ${{github.workspace}}/build/coverage.txt
