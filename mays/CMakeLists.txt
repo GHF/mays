@@ -6,6 +6,7 @@ target_sources(${PROJECT_NAME}
     array_size.h
     average.h
     clamp.h
+    crc.h
     divide.h
     divide_round_up.h
     divide_round_nearest.h
@@ -26,6 +27,7 @@ target_sources(${PROJECT_NAME}_tests
     array_size_test.cc
     average_test.cc
     clamp_test.cc
+    crc_test.cc
     divide_test.cc
     divide_round_up_test.cc
     divide_round_nearest_test.cc
