@@ -12,9 +12,9 @@ namespace {
 
 TEST_CASE("Conditionally negate integer", "[sign_of]") {
   SECTION("Extreme values") {
-    static_assert(0 == NegateIf(0, true));
+    static_assert(0 == NegateIf(0, /*negate=*/true));
     static_assert(std::numeric_limits<int>::min() ==
-                  NegateIf(std::numeric_limits<int>::min(), false));
+                  NegateIf(std::numeric_limits<int>::min(), /*negate=*/false));
   }
 
   SECTION("Common values") {
