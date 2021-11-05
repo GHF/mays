@@ -89,14 +89,27 @@ class Crc {
       RegisterType ls_bytes;
     };
 
-    if constexpr (Traits::kReflect) {
-      return RemainderParts{static_cast<uint8_t>(remainder_),
-                            static_cast<RegisterType>(remainder_ >> 8)};
+    // When the polynomial width is smaller than an octet, the shift register cyclic feedback occurs
+    // before 8 cycles (i.e. within |GetRemainderForBits(…)|) and all remainder bits participate in
+    // the feedback. So |ls_bytes| is zero in this case.
+    if constexpr (Traits::kPolynomialBitWidth <= 8) {
+      if constexpr (Traits::kReflect) {
+        return RemainderParts{static_cast<uint8_t>(remainder_), 0};
+      } else {
+        // First bit of message data to shift in is its MSb, so line up the remainder to the left.
+        return RemainderParts{static_cast<uint8_t>(remainder_ << (8 - Traits::kPolynomialBitWidth)),
+                              0};
+      }
     } else {
-      // First bit of message data needs to be added to the next bit of remainder, which is at its
-      // leftmost position. Shift the remainder right to line it up with the message octet.
-      return RemainderParts{static_cast<uint8_t>(remainder_ >> (Traits::kPolynomialBitWidth - 8)),
-                            static_cast<RegisterType>((remainder_ << 8) & kPolynomialMask)};
+      if constexpr (Traits::kReflect) {
+        return RemainderParts{static_cast<uint8_t>(remainder_),
+                              static_cast<RegisterType>(remainder_ >> 8)};
+      } else {
+        // First bit of message data needs to be added to the next bit of remainder, which is at its
+        // leftmost position. Shift the remainder right to line it up with the message octet.
+        return RemainderParts{static_cast<uint8_t>(remainder_ >> (Traits::kPolynomialBitWidth - 8)),
+                              static_cast<RegisterType>((remainder_ << 8) & kPolynomialMask)};
+      }
     }
   }
 
@@ -254,6 +267,10 @@ class CrcTraits {
 // smaller than data types, initial and output XOR values, etc.
 //
 // TODO(xo): Replace with NOLINTBEGIN(…)/NOLINTEND(…) after upgrading to Clang-Tidy 14
+// NOLINTNEXTLINE(readability-magic-numbers)
+using Crc6Darc = CrcTraits<uint8_t, 6, 0b01'1001, 0, true, 0>;
+// NOLINTNEXTLINE(readability-magic-numbers)
+using Crc7Mmc = CrcTraits<uint8_t, 7, 0b000'1001, 0, false, 0>;
 // NOLINTNEXTLINE(readability-magic-numbers)
 using Crc8Bluetooth = CrcTraits<uint8_t, 8, 0b1010'0111, 0, true, 0>;
 // NOLINTNEXTLINE(readability-magic-numbers)

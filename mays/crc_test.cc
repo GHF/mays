@@ -16,6 +16,8 @@ TEST_CASE("Compute CRCs against their catalog \"check\" values", "[crc]") {
     constexpr std::string_view kTestString = "123456789";
     return decltype(crc)::Compute(kTestString.data(), kTestString.size());
   };
+  CHECK(0x26 == compute_crc(Crc<Crc6Darc>()));
+  CHECK(0x75 == compute_crc(Crc<Crc7Mmc>()));
   CHECK(0x26 == compute_crc(Crc<Crc8Bluetooth>()));
   CHECK(0x059e == compute_crc(Crc<Crc15Can>()));
   CHECK(0xbb3d == compute_crc(Crc<Crc16Arc>()));
@@ -30,6 +32,8 @@ TEST_CASE("Compute CRCs against their catalog \"check\" values", "[crc]") {
 // NOLINTNEXTLINE
 TEMPLATE_TEST_CASE("Compute CRCs in parts is same as in one step",
                    "[crc]",
+                   Crc6Darc,
+                   Crc7Mmc,
                    Crc8Bluetooth,
                    Crc15Can,
                    Crc16Arc,
