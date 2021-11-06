@@ -17,8 +17,9 @@ template <typename T, size_t BitWidth>
   static_assert(BitWidth <= sizeof(T) * 8);
   if constexpr (BitWidth == sizeof(T) * 8) {
     return static_cast<T>(-1);
+  } else {
+    return static_cast<T>((T{1} << BitWidth) - T{1});
   }
-  return static_cast<T>((T{1} << BitWidth) - T{1});
 }
 
 }  // namespace detail
