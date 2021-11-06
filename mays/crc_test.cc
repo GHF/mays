@@ -29,6 +29,17 @@ TEST_CASE("Compute CRCs against their catalog \"check\" values", "[crc]") {
   CHECK(0xcbf43926 == compute_crc(Crc<Crc32IsoHdlc>()));
 }
 
+TEST_CASE("Compute CRCs with an explicit initial value", "[crc]") {
+  // Crc24Openpgp normally has a non-zero initial value.
+  Crc<Crc24Openpgp> crc(/*initial_value=*/0);
+
+  // Run the feedback shift register a single time, so that the polynomial is subtracted from it.
+  crc.AppendBits<1>(0b1);
+
+  // By inspection, the only contents of the register should be the polynomial.
+  CHECK(Crc24Openpgp::kPolynomial == crc.GetCheckValue());
+}
+
 // NOLINTNEXTLINE
 TEMPLATE_TEST_CASE("Compute CRCs in parts is same as in one step",
                    "[crc]",

@@ -36,6 +36,13 @@ class Crc {
  public:
   using RegisterType = typename Traits::RegisterType;
 
+  // Construct a CRC computation whose state is initialized with |initial_value|, which is specified
+  // higher-power-left and will be reflected as necessary for the CRC model.
+  constexpr explicit Crc(RegisterType initial_value = Traits::kInitialValue)
+      : remainder_(Traits::kReflect
+                       ? ReflectBits<RegisterType, Traits::kPolynomialBitWidth>(initial_value)
+                       : initial_value) {}
+
   // Computes a CRC check value over a sequence of octets.
   // The |Octet| template parameter must be an 8-bit type, e.g. uint8_t, std::byte, char, etc.
   template <typename Octet>
@@ -251,12 +258,6 @@ class Crc {
   static_assert(Traits::kPolynomialBitWidth <= kRegisterTypeBitWidth,
                 "RegisterType can't hold polynomial");
 
-  // Initial value, reflected as necessary for the CRC model.
-  static constexpr RegisterType kInitialValue =
-      Traits::kReflect
-          ? ReflectBits<RegisterType, Traits::kPolynomialBitWidth>(Traits::kInitialValue)
-          : Traits::kInitialValue;
-
   // Polynomial with highest-power coefficient in the ones position (reference polynomials are
   // written higher-power-left).
   static constexpr RegisterType kReversePolynomial =
@@ -269,7 +270,7 @@ class Crc {
   // The remainder result of the long division is stored right-aligned with its most powerful
   // coefficient in the leftmost position for unreflected CRCs and rightmost (one's) position for
   // reflected CRCs, i.e. in the same orientation as final check value.
-  RegisterType remainder_ = kInitialValue;
+  RegisterType remainder_;
 };
 
 // CRC model parameters used in the Williams model set out in "A Painless Guide to CRC Error
