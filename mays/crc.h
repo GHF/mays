@@ -289,7 +289,9 @@ class Crc {
 
   // Look-up table for remainders produced by each of the 256 possible octets. This is created for
   // each instantiation of the Crc class (i.e. one table per model).
-  static constexpr OctetRemainderTable kMemoizedRemainders;
+  // Brace initialization is for GCC, which as of 11.2 uses C++14 rules for constexpr static members
+  // in C++17 mode.
+  static constexpr OctetRemainderTable kMemoizedRemainders{};
 
   // The remainder result of the long division is stored right-aligned with its most powerful
   // coefficient in the leftmost position for unreflected CRCs and rightmost (one's) position for
