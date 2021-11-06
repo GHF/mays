@@ -23,9 +23,10 @@ namespace mays {
 // Example:
 //   Crc<Crc16Arc> crc;
 //   crc.AppendOctets("123", 3);
-//   crc.AppendOctets("45", 2);
+//   crc.AppendBits<8>('4');
+//   crc.AppendBits<8>('5');
 //   crc.AppendOctets("6789", 4);
-//   constexpr uint16_t check_value = crc.GetCheckValue();  // |check_value| is 0xbb3d
+//   uint16_t check_value = crc.GetCheckValue();  // |check_value| is 0xbb3d
 //
 // The model used is originally specified in "A Painless Guide to CRC Error Detection Algorithms"
 // (Ross N. Williams, 1993), accessed at https://zlib.net/crc_v3.txt and the implementation is also
