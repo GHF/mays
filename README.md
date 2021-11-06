@@ -121,6 +121,7 @@ The code can be logically organized by their intended purpose:
 
 ### Opinionated tasks
 - [RangeMap](/mays/range_map.h) Joystick-to-process value mapping code
+- [Crc](/mays/crc.h) Single-header (no C++ or mays includes) CRC with compile-time generated look-up tables
 
 License
 -------
