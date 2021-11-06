@@ -441,6 +441,10 @@ using Crc24Openpgp = CrcTraits<uint32_t, 24, 0x864cfb, 0xb704ce, false, 0>;
 using Crc32Bzip2 = CrcTraits<uint32_t, 32, 0x04c11db7, 0xffffffff, false, 0xffffffff>;
 // NOLINTNEXTLINE(readability-magic-numbers)
 using Crc32IsoHdlc = CrcTraits<uint32_t, 32, 0x04c11db7, 0xffffffff, true, 0xffffffff>;
+// NOLINTNEXTLINE(readability-magic-numbers)
+using Crc64Ecma182 = CrcTraits<uint64_t, 64, 0x42f0e1eba9ea3693, 0, false, 0>;
+// NOLINTNEXTLINE(readability-magic-numbers)
+using Crc64Xz = CrcTraits<uint64_t, 64, 0x42f0e1eba9ea3693, ~uint64_t{0}, true, ~uint64_t{0}>;
 
 }  // namespace mays
 
