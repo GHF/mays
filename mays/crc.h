@@ -149,8 +149,10 @@ class Crc {
     }
 
    private:
+    // Explicit aggregrate initialization is for GCC, which disallows uninitialized arrays in
+    // constexpr contexts like the ctor in C++17 mode.
     // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-    RegisterType remainders_[1 << 8];
+    RegisterType remainders_[1 << 8] = {};
   };
 
   // Returns a struct containing:
