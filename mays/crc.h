@@ -22,25 +22,74 @@ template <typename T, size_t BitWidth>
   }
 }
 
+// Reverses all bits in the integral argument |value|.
+template <typename T>
+[[nodiscard]] static constexpr T ReflectBits(T value) {
+  static_assert(sizeof(T) <= sizeof(uint64_t));
+#if defined(__has_builtin) && __has_builtin(__builtin_bitreverse8)
+  // Builtins offer significant speedup for ISAs with bit-reverse ops (e.g. ARM's rbit).
+  if constexpr (sizeof(T) == sizeof(int8_t)) {
+    return __builtin_bitreverse8(value);
+  } else if constexpr (sizeof(T) == sizeof(int16_t)) {
+    return __builtin_bitreverse16(value);
+  } else if constexpr (sizeof(T) == sizeof(int32_t)) {
+    return __builtin_bitreverse32(value);
+  } else {
+    return __builtin_bitreverse64(value);
+  }
+#else   // defined(__has_builtin) && __has_builtin(__builtin_bitreverse8)
+  if constexpr (sizeof(T) == sizeof(int8_t)) {
+    // Technique from "Bit Twiddling Hacks" (Sean Anderson & Mike Keith, 2001) accessed at
+    // http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith32Bits
+    return static_cast<T>(
+        // NOLINTNEXTLINE(readability-magic-numbers)
+        ((value * 0x0802u & 0x22110u) | (value * 0x8020u & 0x88440u)) * 0x10101u >> 16);
+  } else if constexpr (sizeof(T) == sizeof(int16_t)) {
+    const auto lower_reflect = ReflectBits(static_cast<uint8_t>(value));
+    const auto upper_reflect = ReflectBits(static_cast<uint8_t>(value >> 8));
+    return static_cast<T>((lower_reflect << 8) | upper_reflect);
+  } else if constexpr (sizeof(T) == sizeof(int32_t)) {
+    // Technique from "Bit Twiddling Hacks" (Sean Anderson, Edwin Freed, Veldmeijer) accessed at
+    // http://graphics.stanford.edu/~seander/bithacks.html#ReverseParallel
+    // Swap odd and even bits NOLINTNEXTLINE(readability-magic-numbers)
+    value = ((value >> 1) & 0x55555555) | ((value & 0x55555555) << 1);
+    // Swap consecutive pairs NOLINTNEXTLINE(readability-magic-numbers)
+    value = ((value >> 2) & 0x33333333) | ((value & 0x33333333) << 2);
+    // Swap nibbles NOLINTNEXTLINE(readability-magic-numbers)
+    value = ((value >> 4) & 0x0f0f0f0f) | ((value & 0x0f0f0f0f) << 4);
+    // Swap bytes NOLINTNEXTLINE(readability-magic-numbers)
+    value = ((value >> 8) & 0x00ff00ff) | ((value & 0x00ff00ff) << 8);
+    // Swap 2-byte long pairs
+    return (value >> 16) | (value << 16);
+  } else {
+    // Could use the same trick as above but likely not worth the trouble for this uncommon case.
+    const uint64_t lower_reflect = ReflectBits(static_cast<uint32_t>(value));
+    const uint64_t upper_reflect = ReflectBits(static_cast<uint32_t>(value >> 32));
+    return static_cast<T>((lower_reflect << 32) | upper_reflect);
+  }
+#endif  // defined(__has_builtin) && __has_builtin(__builtin_bitreverse8)
+}
+
 // Reverses the order of the lowest |BitWidth| bits in the integral argument |value|.
 template <typename T, size_t BitWidth>
 [[nodiscard]] static constexpr T ReflectBits(T value) {
   static_assert(BitWidth <= sizeof(T) * 8, "Can not reflect more bits than in type T");
+  static_assert(sizeof(T) <= sizeof(uint64_t));
+  auto insert_reflected = [value](auto value_lsbytes) {
+    constexpr T kLowBitsMask = MaskLowBits<T, BitWidth>();
+    const T reflected = ReflectBits(value_lsbytes) >> (8 * sizeof(value_lsbytes) - BitWidth);
+    return static_cast<T>((value & ~kLowBitsMask) | reflected);
+  };
   if constexpr (BitWidth <= 1) {
     return value;
+  } else if constexpr (BitWidth <= 8) {
+    return insert_reflected(static_cast<uint8_t>(value));
+  } else if constexpr (BitWidth <= 16) {
+    return insert_reflected(static_cast<uint16_t>(value));
+  } else if constexpr (BitWidth <= 32) {
+    return insert_reflected(static_cast<uint32_t>(value));
   } else {
-    auto mask = static_cast<T>(T{1} << (BitWidth - 1));
-    T out = value;
-    for (size_t i = 0; i < BitWidth; i++) {
-      if (value & T{1}) {
-        out = static_cast<T>(out | mask);
-      } else {
-        out = static_cast<T>(out & ~mask);
-      }
-      mask >>= 1;
-      value >>= 1;
-    }
-    return out;
+    return insert_reflected(static_cast<uint64_t>(value));
   }
 }
 
