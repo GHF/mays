@@ -103,7 +103,7 @@ class Crc {
         AppendOctets(&octet, 1);
       }
       AppendBits<DataBitWidth % 8>(static_cast<uint8_t>(value));
-    } else {
+    } else if constexpr (DataBitWidth > 0) {
       // Mask off all but the rightmost |DataBitWidth| bits.
       constexpr auto kMask = static_cast<uint8_t>((1 << DataBitWidth) - 1);
       const RegisterType masked_value = static_cast<RegisterType>(value) & kMask;
