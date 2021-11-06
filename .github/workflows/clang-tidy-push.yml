@@ -17,4 +17,5 @@ jobs:
         cmake -B ${{github.workspace}}/build
         ln -s ${{github.workspace}}/build/compile_commands.json ${{github.workspace}}
     - name: Run analysis
-      run: clang-tidy-${{env.CLANG_TIDY_VERSION}} mays/{,**/}*.{cc,h}
+      run: |
+        find mays -name '*.cc' -o -name '*.h' | xargs -P0 -I {} clang-tidy-${{env.CLANG_TIDY_VERSION}} {}
