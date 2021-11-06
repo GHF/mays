@@ -26,6 +26,7 @@ TEST_CASE("Compute CRCs against their catalog \"check\" values", "[crc]") {
   CHECK(0x0ed841 == compute_crc(Crc<Crc21CanFd>()));
   CHECK(0xc25a56 == compute_crc(Crc<Crc24Ble>()));
   CHECK(0x21cf02 == compute_crc(Crc<Crc24Openpgp>()));
+  CHECK(0xfc891918 == compute_crc(Crc<Crc32Bzip2>()));
   CHECK(0xcbf43926 == compute_crc(Crc<Crc32IsoHdlc>()));
 }
 
@@ -53,6 +54,7 @@ TEMPLATE_TEST_CASE("Compute CRCs in parts is same as in one step",
                    Crc21CanFd,
                    Crc24Ble,
                    Crc24Openpgp,
+                   Crc32Bzip2,
                    Crc32IsoHdlc) {
   constexpr std::string_view kTestString = "123456789";
   constexpr auto compute_crc = [kTestString] {

@@ -9,6 +9,19 @@
 #include <cstdint>
 
 namespace mays {
+namespace detail {
+
+// Generates a mask with only the lowest |BitWidth| bits set.
+template <typename T, size_t BitWidth>
+[[nodiscard]] constexpr T MaskLowBits() {
+  static_assert(BitWidth <= sizeof(T) * 8);
+  if constexpr (BitWidth == sizeof(T) * 8) {
+    return static_cast<T>(-1);
+  }
+  return static_cast<T>((T{1} << BitWidth) - T{1});
+}
+
+}  // namespace detail
 
 // Computes a cyclic redundancy check (CRC) over a message using the CRC model parameters specified
 // by |Traits|. Some CRC models are provided as aliases of the |CrcTraits| helper class.
@@ -106,7 +119,7 @@ class Crc {
       AppendBits<DataBitWidth % 8>(static_cast<uint8_t>(value));
     } else if constexpr (DataBitWidth > 0) {
       // Mask off all but the rightmost |DataBitWidth| bits.
-      constexpr auto kMask = static_cast<uint8_t>((1 << DataBitWidth) - 1);
+      constexpr auto kMask = ::mays::detail::MaskLowBits<uint8_t, DataBitWidth>();
       const RegisterType masked_value = static_cast<RegisterType>(value) & kMask;
 
       // Add |remainder_| to |masked_value|, taking into account |Traits::kReflect| to line up bits.
@@ -291,7 +304,7 @@ class Crc {
 
   // Bit mask with the rightmost polynomial coefficient bits (0 or 1) set.
   static constexpr RegisterType kPolynomialMask =
-      static_cast<RegisterType>(~(static_cast<RegisterType>(-1) << kPolynomialBitWidth));
+      ::mays::detail::MaskLowBits<RegisterType, kPolynomialBitWidth>();
 
   // Look-up table for remainders produced by each of the 256 possible octets. This is created for
   // each instantiation of the Crc class (i.e. one table per model).
@@ -371,6 +384,8 @@ using Crc21CanFd = CrcTraits<uint32_t, 21, 0x102899, 0, false, 0>;
 using Crc24Ble = CrcTraits<uint32_t, 24, 0x00065b, 0x555555, true, 0>;
 // NOLINTNEXTLINE(readability-magic-numbers)
 using Crc24Openpgp = CrcTraits<uint32_t, 24, 0x864cfb, 0xb704ce, false, 0>;
+// NOLINTNEXTLINE(readability-magic-numbers)
+using Crc32Bzip2 = CrcTraits<uint32_t, 32, 0x04c11db7, 0xffffffff, false, 0xffffffff>;
 // NOLINTNEXTLINE(readability-magic-numbers)
 using Crc32IsoHdlc = CrcTraits<uint32_t, 32, 0x04c11db7, 0xffffffff, true, 0xffffffff>;
 
