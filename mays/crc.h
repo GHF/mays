@@ -84,52 +84,53 @@ class Crc {
     static_assert(DataBitWidth <= sizeof(DataType) * 8,
                   "Can not process more bits than in type DataType");
 
-    // Put |value| in a type that's unsigned and large enough to hold both |remainder_| and |value|.
-    // This is similar to using std::make_unsigned_t<std::common_type_t<DataType, RegisterType>> but
-    // without including <type_traits>.
-    auto padded_value = [value] {
-      if constexpr (sizeof(DataType) > sizeof(RegisterType)) {
-        if constexpr (sizeof(DataType) <= sizeof(unsigned int)) {
-          return static_cast<unsigned int>(value);
-        } else if constexpr (sizeof(DataType) <= sizeof(unsigned long)) {
-          return static_cast<unsigned long>(value);
-        } else {
-          static_assert(sizeof(DataType) == sizeof(unsigned long long));
-          return static_cast<unsigned long>(value);
+    // Use the memoized octet-oriented implementation to process 8 bits at a time.
+    if constexpr (DataBitWidth >= 8) {
+      for (size_t num_data_bits = DataBitWidth; num_data_bits >= 8; num_data_bits -= 8) {
+        const uint8_t octet = [&] {
+          if constexpr (Traits::kReflect) {
+            // Note that this branch is shifting |value| but the other does not. This leaves the
+            // remaining |DataBitWidth % 8| bits at the rightmost positions of |value|.
+            const auto octet = static_cast<uint8_t>(value);
+
+            // Shifting by 8 is done this way to allow for |DataType| = uint8_t.
+            value = (value >> 4) >> 4;
+            return octet;
+          } else {
+            return static_cast<uint8_t>(value >> (num_data_bits - 8));
+          }
+        }();
+        AppendOctets(&octet, 1);
+      }
+      AppendBits<DataBitWidth % 8>(static_cast<uint8_t>(value));
+    } else {
+      // Mask off all but the rightmost |DataBitWidth| bits.
+      constexpr auto kMask = static_cast<uint8_t>((1 << DataBitWidth) - 1);
+      const RegisterType masked_value = static_cast<RegisterType>(value) & kMask;
+
+      // Add |remainder_| to |masked_value|, taking into account |Traits::kReflect| to line up bits.
+      const RegisterType dividend = [this, masked_value] {
+        if constexpr (Traits::kReflect) {
+          return static_cast<RegisterType>(masked_value ^ remainder_);
         }
-      } else {
-        return static_cast<RegisterType>(value);
-      }
-    }();
-    using DividendType = decltype(padded_value);
+        // In the unreflected model, |remainder_| has opposite orientation to |kReversePolynomial|
+        // so it must be reflected. This also places its highest-power cofficient on the right,
+        // where it's more convenient. However, in their normal orientation, the message bits and
+        // remainder bits must be lined up along their leftmost bit.
+        if constexpr (DataBitWidth > kPolynomialBitWidth) {
+          const auto aligned_remainder =
+              static_cast<RegisterType>(remainder_ << (DataBitWidth - kPolynomialBitWidth));
+          return ReflectBits<RegisterType, DataBitWidth>(masked_value ^ aligned_remainder);
+        } else {
+          const auto aligned_masked_value =
+              static_cast<RegisterType>(masked_value << (kPolynomialBitWidth - DataBitWidth));
+          return ReflectBits<RegisterType, kPolynomialBitWidth>(aligned_masked_value ^ remainder_);
+        }
+      }();
 
-    // Mask off all but the rightmost |DataBitWidth| bits.
-    constexpr auto kMask =
-        static_cast<DividendType>(~(static_cast<DividendType>(-1) << DataBitWidth));
-    const DividendType masked_value = padded_value & kMask;
-
-    // Add |remainder_| to |masked_value|, taking into account |Traits::kReflect| to line up bits.
-    const DividendType dividend = [this, masked_value] {
-      if constexpr (Traits::kReflect) {
-        return static_cast<DividendType>(masked_value ^ remainder_);
-      }
-      // In the unreflected model, |remainder_| has opposite orientation to |kReversePolynomial| so
-      // it must be reflected. This also places its highest-power cofficient on the right, where
-      // it's more convenient. However, in their normal orientation, the message bits and remainder
-      // bits must be lined up along their leftmost bit.
-      if constexpr (DataBitWidth > kPolynomialBitWidth) {
-        const auto aligned_remainder =
-            static_cast<DividendType>(remainder_ << (DataBitWidth - kPolynomialBitWidth));
-        return ReflectBits<DividendType, DataBitWidth>(masked_value ^ aligned_remainder);
-      } else {
-        const auto aligned_masked_value =
-            static_cast<DividendType>(masked_value << (kPolynomialBitWidth - DataBitWidth));
-        return ReflectBits<DividendType, kPolynomialBitWidth>(aligned_masked_value ^ remainder_);
-      }
-    }();
-
-    // Run the feedback system |DataBitWidth| cycles and obtain the remainder.
-    remainder_ = GetRemainderForBits<DividendType, DataBitWidth>(dividend);
+      // Run the feedback system |DataBitWidth| cycles and obtain the remainder.
+      remainder_ = GetRemainderForBits<RegisterType, DataBitWidth>(dividend);
+    }
   }
 
   // Returns the current CRC check value.
