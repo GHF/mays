@@ -1,5 +1,6 @@
 // (C) Copyright 2019 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #ifndef MAYS_ARRAY_SIZE_H
 #define MAYS_ARRAY_SIZE_H
@@ -16,13 +17,13 @@ template <typename T, unsigned Rank>
 struct array_size;  // base case (primary template) is undefined
 
 template <typename T, size_t N>
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
+// NOLINTNEXTLINE(modernize-avoid-c-arrays)
 struct array_size<T[N], 0U> {
   static constexpr size_t value = N;
 };
 
 template <typename T, size_t N, unsigned Rank>
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
+// NOLINTNEXTLINE(modernize-avoid-c-arrays)
 struct array_size<T[N], Rank> : array_size<T, Rank - 1> {};
 
 template <typename T, unsigned Rank>
@@ -50,9 +51,9 @@ constexpr size_t array_size_v = array_size<T, Rank>::value;
 //     const size_t num_elements = mays::ArraySize(elements);
 //   }
 template <size_t Rank = 0, typename T = void, size_t N = 0>
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
+// NOLINTNEXTLINE(modernize-avoid-c-arrays)
 [[nodiscard]] constexpr size_t ArraySize(const T (&)[N]) {
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTNEXTLINE(modernize-avoid-c-arrays)
   return ::mays::detail::array_size_v<T[N], Rank>;
 }
 
