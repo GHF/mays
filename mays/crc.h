@@ -70,6 +70,56 @@ class Crc {
     }
   }
 
+  // Processes the rightmost |DataBitWidth| bits in |value| through the CRC. Other bits in |value|
+  // are ignored. May be called multiple times to process parts of a full sequence. Calls to this
+  // function do not commutate.
+  template <size_t DataBitWidth, typename DataType>
+  constexpr void AppendBits(DataType value) {
+    static_assert(DataBitWidth <= sizeof(DataType) * 8,
+                  "Can not process more bits than in type DataType");
+
+    // Put |value| in a type that's unsigned and large enough to hold both |remainder_| and |value|.
+    // This is similar to using std::make_unsigned_t<std::common_type_t<DataType, RegisterType>> but
+    // without including <type_traits>.
+    auto padded_value = [value] {
+      if constexpr (sizeof(DataType) > sizeof(RegisterType)) {
+        if constexpr (sizeof(DataType) <= sizeof(unsigned int)) {
+          return static_cast<unsigned int>(value);
+        } else if constexpr (sizeof(DataType) <= sizeof(unsigned long)) {
+          return static_cast<unsigned long>(value);
+        } else {
+          static_assert(sizeof(DataType) == sizeof(unsigned long long));
+          return static_cast<unsigned long>(value);
+        }
+      } else {
+        return static_cast<RegisterType>(value);
+      }
+    }();
+    using DividendType = decltype(padded_value);
+
+    // Mask off all but the rightmost |DataBitWidth| bits.
+    constexpr auto kMask =
+        static_cast<DividendType>(~(static_cast<DividendType>(-1) << DataBitWidth));
+    const DividendType masked_value = padded_value & kMask;
+
+    // Add |remainder_| to |masked_value|, taking into account |Traits::kReflect| to line up bits.
+    const DividendType dividend = [this, masked_value] {
+      if constexpr (Traits::kReflect) {
+        return static_cast<DividendType>(masked_value ^ remainder_);
+      }
+      // In the unreflected model, |remainder_| has opposite orientation to |kReversePolynomial| so
+      // it must be reflected. This also places its highest-power cofficient on the right, where
+      // it's more convenient, but then message bits must also be reflected to match. Finally,
+      // |GetRemainderForBits(…)| expects the data bits MSb-left, so reflect once more.
+      return ReflectBits<DividendType, DataBitWidth>(
+          ReflectBits<DividendType, DataBitWidth>(masked_value) ^
+          ReflectBits<DividendType, Traits::kPolynomialBitWidth>(remainder_));
+    }();
+
+    // Run the feedback system |DataBitWidth| cycles and obtain the remainder.
+    remainder_ = GetRemainderForBits<DividendType, DataBitWidth>(dividend);
+  }
+
   // Returns the current CRC check value.
   [[nodiscard]] constexpr RegisterType GetCheckValue() const {
     return remainder_ ^ Traits::kOutputXorMask;
@@ -180,19 +230,20 @@ class Crc {
     static_assert(BitWidth <= sizeof(T) * 8, "Can not reflect more bits than in type T");
     if constexpr (BitWidth <= 1) {
       return value;
-    }
-    T mask = T{1} << (BitWidth - 1);
-    T out = value;
-    for (size_t i = 0; i < BitWidth; i++) {
-      if (value & T{1}) {
-        out = static_cast<T>(out | mask);
-      } else {
-        out = static_cast<T>(out & ~mask);
+    } else {
+      auto mask = static_cast<T>(T{1} << (BitWidth - 1));
+      T out = value;
+      for (size_t i = 0; i < BitWidth; i++) {
+        if (value & T{1}) {
+          out = static_cast<T>(out | mask);
+        } else {
+          out = static_cast<T>(out & ~mask);
+        }
+        mask >>= 1;
+        value >>= 1;
       }
-      mask >>= 1;
-      value >>= 1;
+      return out;
     }
-    return out;
   }
 
   static_assert(static_cast<RegisterType>(-1) > 0, "Accumulation register must not be signed");
