@@ -73,7 +73,7 @@ class Crc {
       // with the 8 message bits, aside from being shifted 8 positions. The shift is associative
       // w.r.t. addition, and was already performed by |SplitRemainder|, so add those bits back in
       // after operating the feedback shift register.
-      remainder_ = GetRemainderForBits(dividend) ^ remainder_lsbytes;
+      remainder_ = kMemoizedRemainders.GetRemainderForOctet(dividend) ^ remainder_lsbytes;
     }
   }
 
@@ -133,6 +133,26 @@ class Crc {
   }
 
  private:
+  // Memoizes computing a remainder for each of the 256 possible 8-bit values at compile time.
+  class OctetRemainderTable {
+   public:
+    constexpr OctetRemainderTable() {
+      for (size_t i = 0; i < sizeof(remainders_) / sizeof(RegisterType); i++) {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
+        remainders_[i] = GetRemainderForBits(static_cast<uint8_t>(i));
+      }
+    }
+
+    [[nodiscard]] constexpr RegisterType GetRemainderForOctet(uint8_t octet) const {
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
+      return remainders_[octet];
+    }
+
+   private:
+    // NOLINTNEXTLINE(modernize-avoid-c-arrays)
+    RegisterType remainders_[1 << 8];
+  };
+
   // Returns a struct containing:
   // - Highest-power bits (up to 8) of |remainder_|. In the case that |remainder_| has fewer than 8
   //   bits: right-aligned if |Traits::kReflected|, else left-aligned.
@@ -266,6 +286,10 @@ class Crc {
   // Bit mask with the rightmost polynomial coefficient bits (0 or 1) set.
   static constexpr RegisterType kPolynomialMask =
       static_cast<RegisterType>(~(static_cast<RegisterType>(-1) << Traits::kPolynomialBitWidth));
+
+  // Look-up table for remainders produced by each of the 256 possible octets. This is created for
+  // each instantiation of the Crc class (i.e. one table per model).
+  static constexpr OctetRemainderTable kMemoizedRemainders;
 
   // The remainder result of the long division is stored right-aligned with its most powerful
   // coefficient in the leftmost position for unreflected CRCs and rightmost (one's) position for
