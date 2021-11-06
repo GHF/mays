@@ -22,6 +22,28 @@ template <typename T, size_t BitWidth>
   }
 }
 
+// Reverses the order of the lowest |BitWidth| bits in the integral argument |value|.
+template <typename T, size_t BitWidth>
+[[nodiscard]] static constexpr T ReflectBits(T value) {
+  static_assert(BitWidth <= sizeof(T) * 8, "Can not reflect more bits than in type T");
+  if constexpr (BitWidth <= 1) {
+    return value;
+  } else {
+    auto mask = static_cast<T>(T{1} << (BitWidth - 1));
+    T out = value;
+    for (size_t i = 0; i < BitWidth; i++) {
+      if (value & T{1}) {
+        out = static_cast<T>(out | mask);
+      } else {
+        out = static_cast<T>(out & ~mask);
+      }
+      mask >>= 1;
+      value >>= 1;
+    }
+    return out;
+  }
+}
+
 }  // namespace detail
 
 // Computes a cyclic redundancy check (CRC) over a message using the CRC model parameters specified
@@ -54,8 +76,9 @@ class Crc {
   // Construct a CRC computation whose state is initialized with |initial_value|, which is specified
   // higher-power-left and will be reflected as necessary for the CRC model.
   constexpr explicit Crc(RegisterType initial_value = Traits::kInitialValue)
-      : remainder_(Traits::kReflect ? ReflectBits<RegisterType, kPolynomialBitWidth>(initial_value)
-                                    : initial_value) {}
+      : remainder_(Traits::kReflect
+                       ? detail::ReflectBits<RegisterType, kPolynomialBitWidth>(initial_value)
+                       : initial_value) {}
 
   // Computes a CRC check value over a sequence of octets.
   // The |Octet| template parameter must be an 8-bit type, e.g. uint8_t, std::byte, char, etc.
@@ -120,7 +143,7 @@ class Crc {
       AppendBits<DataBitWidth % 8>(static_cast<uint8_t>(value));
     } else if constexpr (DataBitWidth > 0) {
       // Mask off all but the rightmost |DataBitWidth| bits.
-      constexpr auto kMask = ::mays::detail::MaskLowBits<uint8_t, DataBitWidth>();
+      constexpr auto kMask = detail::MaskLowBits<uint8_t, DataBitWidth>();
       const RegisterType masked_value = static_cast<RegisterType>(value) & kMask;
 
       // Add |remainder_| to |masked_value|, taking into account |Traits::kReflect| to line up bits.
@@ -135,11 +158,12 @@ class Crc {
         if constexpr (DataBitWidth > kPolynomialBitWidth) {
           const auto aligned_remainder =
               static_cast<RegisterType>(remainder_ << (DataBitWidth - kPolynomialBitWidth));
-          return ReflectBits<RegisterType, DataBitWidth>(masked_value ^ aligned_remainder);
+          return detail::ReflectBits<RegisterType, DataBitWidth>(masked_value ^ aligned_remainder);
         } else {
           const auto aligned_masked_value =
               static_cast<RegisterType>(masked_value << (kPolynomialBitWidth - DataBitWidth));
-          return ReflectBits<RegisterType, kPolynomialBitWidth>(aligned_masked_value ^ remainder_);
+          return detail::ReflectBits<RegisterType, kPolynomialBitWidth>(aligned_masked_value ^
+                                                                        remainder_);
         }
       }();
 
@@ -162,7 +186,8 @@ class Crc {
         // |kReversePolynomial| is higher-power-right, so this unintuitively negative reflect
         // condition is to orient the MSb (left) of unreflected data towards the right in order to
         // account for "reflecting the world" (Williams).
-        const auto value = static_cast<uint8_t>(Traits::kReflect ? i : ReflectBits<size_t, 8>(i));
+        const auto value =
+            static_cast<uint8_t>(Traits::kReflect ? i : detail::ReflectBits<size_t, 8>(i));
 
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
         remainders_[i] = GetRemainderForBits(value);
@@ -266,31 +291,9 @@ class Crc {
 
     // Unreflected CRCs want results MSb-left, so reflect as necessary.
     if constexpr (!Traits::kReflect) {
-      accumulator = ReflectBits<decltype(accumulator), kPolynomialBitWidth>(accumulator);
+      accumulator = detail::ReflectBits<decltype(accumulator), kPolynomialBitWidth>(accumulator);
     }
     return static_cast<RegisterType>(accumulator);
-  }
-
-  // Reverses the order of the lowest |BitWidth| bits in the integral argument |value|.
-  template <typename T, size_t BitWidth>
-  [[nodiscard]] static constexpr T ReflectBits(T value) {
-    static_assert(BitWidth <= sizeof(T) * 8, "Can not reflect more bits than in type T");
-    if constexpr (BitWidth <= 1) {
-      return value;
-    } else {
-      auto mask = static_cast<T>(T{1} << (BitWidth - 1));
-      T out = value;
-      for (size_t i = 0; i < BitWidth; i++) {
-        if (value & T{1}) {
-          out = static_cast<T>(out | mask);
-        } else {
-          out = static_cast<T>(out & ~mask);
-        }
-        mask >>= 1;
-        value >>= 1;
-      }
-      return out;
-    }
   }
 
   static_assert(static_cast<RegisterType>(-1) > 0, "Accumulation register must not be signed");
@@ -301,11 +304,11 @@ class Crc {
   // Polynomial with highest-power coefficient in the ones position (reference polynomials are
   // written higher-power-left).
   static constexpr RegisterType kReversePolynomial =
-      ReflectBits<RegisterType, kPolynomialBitWidth>(Traits::kPolynomial);
+      detail::ReflectBits<RegisterType, kPolynomialBitWidth>(Traits::kPolynomial);
 
   // Bit mask with the rightmost polynomial coefficient bits (0 or 1) set.
   static constexpr RegisterType kPolynomialMask =
-      ::mays::detail::MaskLowBits<RegisterType, kPolynomialBitWidth>();
+      detail::MaskLowBits<RegisterType, kPolynomialBitWidth>();
 
   // Look-up table for remainders produced by each of the 256 possible octets. This is created for
   // each instantiation of the Crc class (i.e. one table per model).
