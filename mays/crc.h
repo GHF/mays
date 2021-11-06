@@ -116,10 +116,18 @@ class Crc {
       }
       // In the unreflected model, |remainder_| has opposite orientation to |kReversePolynomial| so
       // it must be reflected. This also places its highest-power cofficient on the right, where
-      // it's more convenient, but then message bits must also be reflected to match.
-      return static_cast<DividendType>(
-          ReflectBits<DividendType, DataBitWidth>(masked_value) ^
-          ReflectBits<RegisterType, Traits::kPolynomialBitWidth>(remainder_));
+      // it's more convenient. However, in their normal orientation, the message bits and remainder
+      // bits must be lined up along their leftmost bit.
+      if constexpr (DataBitWidth > Traits::kPolynomialBitWidth) {
+        const auto aligned_remainder =
+            static_cast<DividendType>(remainder_ << (DataBitWidth - Traits::kPolynomialBitWidth));
+        return ReflectBits<DividendType, DataBitWidth>(masked_value ^ aligned_remainder);
+      } else {
+        const auto aligned_masked_value =
+            static_cast<DividendType>(masked_value << (Traits::kPolynomialBitWidth - DataBitWidth));
+        return ReflectBits<DividendType, Traits::kPolynomialBitWidth>(aligned_masked_value ^
+                                                                      remainder_);
+      }
     }();
 
     // Run the feedback system |DataBitWidth| cycles and obtain the remainder.
