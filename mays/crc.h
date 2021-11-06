@@ -39,9 +39,8 @@ class Crc {
   // Construct a CRC computation whose state is initialized with |initial_value|, which is specified
   // higher-power-left and will be reflected as necessary for the CRC model.
   constexpr explicit Crc(RegisterType initial_value = Traits::kInitialValue)
-      : remainder_(Traits::kReflect
-                       ? ReflectBits<RegisterType, Traits::kPolynomialBitWidth>(initial_value)
-                       : initial_value) {}
+      : remainder_(Traits::kReflect ? ReflectBits<RegisterType, kPolynomialBitWidth>(initial_value)
+                                    : initial_value) {}
 
   // Computes a CRC check value over a sequence of octets.
   // The |Octet| template parameter must be an 8-bit type, e.g. uint8_t, std::byte, char, etc.
@@ -118,15 +117,14 @@ class Crc {
       // it must be reflected. This also places its highest-power cofficient on the right, where
       // it's more convenient. However, in their normal orientation, the message bits and remainder
       // bits must be lined up along their leftmost bit.
-      if constexpr (DataBitWidth > Traits::kPolynomialBitWidth) {
+      if constexpr (DataBitWidth > kPolynomialBitWidth) {
         const auto aligned_remainder =
-            static_cast<DividendType>(remainder_ << (DataBitWidth - Traits::kPolynomialBitWidth));
+            static_cast<DividendType>(remainder_ << (DataBitWidth - kPolynomialBitWidth));
         return ReflectBits<DividendType, DataBitWidth>(masked_value ^ aligned_remainder);
       } else {
         const auto aligned_masked_value =
-            static_cast<DividendType>(masked_value << (Traits::kPolynomialBitWidth - DataBitWidth));
-        return ReflectBits<DividendType, Traits::kPolynomialBitWidth>(aligned_masked_value ^
-                                                                      remainder_);
+            static_cast<DividendType>(masked_value << (kPolynomialBitWidth - DataBitWidth));
+        return ReflectBits<DividendType, kPolynomialBitWidth>(aligned_masked_value ^ remainder_);
       }
     }();
 
@@ -183,13 +181,12 @@ class Crc {
     // When the polynomial width is smaller than an octet, the shift register cyclic feedback occurs
     // before 8 cycles (i.e. within |GetRemainderForBits(…)|) and all remainder bits participate in
     // the feedback. So |ls_bytes| is zero in this case.
-    if constexpr (Traits::kPolynomialBitWidth <= 8) {
+    if constexpr (kPolynomialBitWidth <= 8) {
       if constexpr (Traits::kReflect) {
         return RemainderParts{static_cast<uint8_t>(remainder_), 0};
       } else {
         // First bit of message data to shift in is its MSb, so line up the remainder to the left.
-        return RemainderParts{static_cast<uint8_t>(remainder_ << (8 - Traits::kPolynomialBitWidth)),
-                              0};
+        return RemainderParts{static_cast<uint8_t>(remainder_ << (8 - kPolynomialBitWidth)), 0};
       }
     } else {
       if constexpr (Traits::kReflect) {
@@ -198,7 +195,7 @@ class Crc {
       } else {
         // First bit of message data needs to be added to the next bit of remainder, which is at its
         // leftmost position. Shift the remainder right to line it up with the message octet.
-        return RemainderParts{static_cast<uint8_t>(remainder_ >> (Traits::kPolynomialBitWidth - 8)),
+        return RemainderParts{static_cast<uint8_t>(remainder_ >> (kPolynomialBitWidth - 8)),
                               static_cast<RegisterType>((remainder_ << 8) & kPolynomialMask)};
       }
     }
@@ -211,8 +208,8 @@ class Crc {
   //
   // Any additional bits to the left of |value|'s |DataBitWidth| bits (e.g. the current
   // |remainder_|) can also participate in the long division cyclic feedback. However, if there are
-  // more than |Traits::kPolynomialBitWidth| bits loaded into |value|, those bits may be lost and
-  // that case isn't tested.
+  // more than |kPolynomialBitWidth| bits loaded into |value|, those bits may be lost and that case
+  // isn't tested.
   template <typename DataType, size_t DataBitWidth = sizeof(DataType) * 8>
   [[nodiscard]] static constexpr RegisterType GetRemainderForBits(DataType value) {
     static_assert(DataBitWidth <= sizeof(DataType) * 8,
@@ -253,7 +250,7 @@ class Crc {
 
     // Unreflected CRCs want results MSb-left, so reflect as necessary.
     if constexpr (!Traits::kReflect) {
-      accumulator = ReflectBits<decltype(accumulator), Traits::kPolynomialBitWidth>(accumulator);
+      accumulator = ReflectBits<decltype(accumulator), kPolynomialBitWidth>(accumulator);
     }
     return static_cast<RegisterType>(accumulator);
   }
@@ -281,18 +278,18 @@ class Crc {
   }
 
   static_assert(static_cast<RegisterType>(-1) > 0, "Accumulation register must not be signed");
+  static constexpr size_t kPolynomialBitWidth = Traits::kPolynomialBitWidth;
   static constexpr size_t kRegisterTypeBitWidth = 8 * sizeof(RegisterType);
-  static_assert(Traits::kPolynomialBitWidth <= kRegisterTypeBitWidth,
-                "RegisterType can't hold polynomial");
+  static_assert(kPolynomialBitWidth <= kRegisterTypeBitWidth, "RegisterType can't hold polynomial");
 
   // Polynomial with highest-power coefficient in the ones position (reference polynomials are
   // written higher-power-left).
   static constexpr RegisterType kReversePolynomial =
-      ReflectBits<RegisterType, Traits::kPolynomialBitWidth>(Traits::kPolynomial);
+      ReflectBits<RegisterType, kPolynomialBitWidth>(Traits::kPolynomial);
 
   // Bit mask with the rightmost polynomial coefficient bits (0 or 1) set.
   static constexpr RegisterType kPolynomialMask =
-      static_cast<RegisterType>(~(static_cast<RegisterType>(-1) << Traits::kPolynomialBitWidth));
+      static_cast<RegisterType>(~(static_cast<RegisterType>(-1) << kPolynomialBitWidth));
 
   // Look-up table for remainders produced by each of the 256 possible octets. This is created for
   // each instantiation of the Crc class (i.e. one table per model).
