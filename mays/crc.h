@@ -116,11 +116,10 @@ class Crc {
       }
       // In the unreflected model, |remainder_| has opposite orientation to |kReversePolynomial| so
       // it must be reflected. This also places its highest-power cofficient on the right, where
-      // it's more convenient, but then message bits must also be reflected to match. Finally,
-      // |GetRemainderForBits(…)| expects the data bits MSb-left, so reflect once more.
-      return ReflectBits<DividendType, DataBitWidth>(
+      // it's more convenient, but then message bits must also be reflected to match.
+      return static_cast<DividendType>(
           ReflectBits<DividendType, DataBitWidth>(masked_value) ^
-          ReflectBits<DividendType, Traits::kPolynomialBitWidth>(remainder_));
+          ReflectBits<RegisterType, Traits::kPolynomialBitWidth>(remainder_));
     }();
 
     // Run the feedback system |DataBitWidth| cycles and obtain the remainder.
@@ -138,8 +137,13 @@ class Crc {
    public:
     constexpr OctetRemainderTable() {
       for (size_t i = 0; i < sizeof(remainders_) / sizeof(RegisterType); i++) {
+        // |kReversePolynomial| is higher-power-right, so this unintuitively negative reflect
+        // condition is to orient the MSb (left) of unreflected data towards the right in order to
+        // account for "reflecting the world" (Williams).
+        const auto value = static_cast<uint8_t>(Traits::kReflect ? i : ReflectBits<size_t, 8>(i));
+
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-        remainders_[i] = GetRemainderForBits(static_cast<uint8_t>(i));
+        remainders_[i] = GetRemainderForBits(value);
       }
     }
 
@@ -194,8 +198,8 @@ class Crc {
 
   // Compute the remainder of |value| divided by |Traits::kPolynomial| in which each bit is a
   // coefficient of a |DataBitWidth|-th power polynomial, right-aligned within |DataType| with the
-  // LSb in the ones (rightmost) position (i.e. unreflected). The order by which the coefficients of
-  // |value| are shifted out depends on |Traits::kReflect|.
+  // first coefficient to be shifted out in the ones (rightmost) position. Converting the data to
+  // the appropriate orientation depends on |Traits::kReflect|.
   //
   // Any additional bits to the left of |value|'s |DataBitWidth| bits (e.g. the current
   // |remainder_|) can also participate in the long division cyclic feedback. However, if there are
@@ -205,13 +209,6 @@ class Crc {
   [[nodiscard]] static constexpr RegisterType GetRemainderForBits(DataType value) {
     static_assert(DataBitWidth <= sizeof(DataType) * 8,
                   "Can not process more bits than DataType holds");
-
-    // |kReversePolynomial| is higher-power-right, so this unintuitively negative reflect condition
-    // is to orient the MSb (left) of unreflected data towards the right in order to account for
-    // "reflecting the world" (Williams).
-    if constexpr (!Traits::kReflect) {
-      value = ReflectBits<DataType, DataBitWidth>(value);
-    }
 
     // Store the value of the data bits into a working register large enough to XOR with the
     // polynomial. Type deduction using this lambda prevents promotion to int (which is signed),
