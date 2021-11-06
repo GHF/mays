@@ -9,6 +9,7 @@ Checks: >
   cert-*,
   google-*,
   -google-build-using-namespace,
+  -google-runtime-int,
   llvm-*,
   -llvm-header-guard,
   misc-*,
