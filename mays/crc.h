@@ -254,23 +254,23 @@ class CrcTraits {
 // smaller than data types, initial and output XOR values, etc.
 //
 // TODO(xo): Replace with NOLINTBEGIN(…)/NOLINTEND(…) after upgrading to Clang-Tidy 14
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+// NOLINTNEXTLINE(readability-magic-numbers)
 using Crc8Bluetooth = CrcTraits<uint8_t, 8, 0b1010'0111, 0, true, 0>;
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+// NOLINTNEXTLINE(readability-magic-numbers)
 using Crc15Can = CrcTraits<uint16_t, 15, 0b0100'0101'1001'1001, 0, false, 0>;
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+// NOLINTNEXTLINE(readability-magic-numbers)
 using Crc16Arc = CrcTraits<uint16_t, 16, 0b1000'0000'0000'0101, 0, true, 0>;
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+// NOLINTNEXTLINE(readability-magic-numbers)
 using Crc16Xmodem = CrcTraits<uint16_t, 16, 0b0001'0000'0010'0001, 0, false, 0>;
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+// NOLINTNEXTLINE(readability-magic-numbers)
 using Crc17CanFd = CrcTraits<uint32_t, 17, 0x1685b, 0, false, 0>;
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+// NOLINTNEXTLINE(readability-magic-numbers)
 using Crc21CanFd = CrcTraits<uint32_t, 21, 0x102899, 0, false, 0>;
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+// NOLINTNEXTLINE(readability-magic-numbers)
 using Crc24Ble = CrcTraits<uint32_t, 24, 0x00065b, 0x555555, true, 0>;
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+// NOLINTNEXTLINE(readability-magic-numbers)
 using Crc24Openpgp = CrcTraits<uint32_t, 24, 0x864cfb, 0xb704ce, false, 0>;
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+// NOLINTNEXTLINE(readability-magic-numbers)
 using Crc32IsoHdlc = CrcTraits<uint32_t, 32, 0x04c11db7, 0xffffffff, true, 0xffffffff>;
 
 }  // namespace mays

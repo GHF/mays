@@ -1,5 +1,6 @@
 // (C) Copyright 2020 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #include "divide_round_nearest.h"
 
@@ -50,9 +51,9 @@ TEST_CASE("Compute quotient approximation", "[divide_round_nearest]") {
   }
 
   SECTION(".5 < remainder < 1") {
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    // NOLINTNEXTLINE(readability-magic-numbers)
     static_assert(2 == DivideRoundNearest(5, 3));
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    // NOLINTNEXTLINE(readability-magic-numbers)
     static_assert(2U == DivideRoundNearest(5U, 3U));
   }
 

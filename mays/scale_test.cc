@@ -109,7 +109,7 @@ TEST_CASE("Scale value by an integer unit rate", "[scale]") {
   const auto [result, x] = GENERATE(table<int, int>({{0, 0}, {10, 1}, {20, 2}}));
   CHECK(result == Scale(x, a, b));
   constexpr Scaler<int16_t, int, int> scaler(1'000, 1'001);
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+  // NOLINTNEXTLINE(readability-magic-numbers)
   static_assert(29970 == scaler.Scale(30'000));  // |scaled| is 29'970
 }
 

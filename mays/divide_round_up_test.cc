@@ -1,5 +1,6 @@
 // (C) Copyright 2020 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #include "divide_round_up.h"
 
@@ -35,9 +36,9 @@ TEST_CASE("Compute quotients rounded up", "[divide_round_up]") {
   }
 
   SECTION("Not integral or half") {
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    // NOLINTNEXTLINE(readability-magic-numbers)
     static_assert(2 == DivideRoundUp(5, 3));
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    // NOLINTNEXTLINE(readability-magic-numbers)
     static_assert(2U == DivideRoundUp(5U, 3U));
   }
 
