@@ -1,5 +1,6 @@
 // (C) Copyright 2020 Xo Wang <xo@geekshavefeelings.com>
 // SPDX-License-Identifier: Apache-2.0
+// vim: et:sw=2:ts=2:tw=100
 
 #ifndef MAYS_INTERNAL_POLYFILL_H
 #define MAYS_INTERNAL_POLYFILL_H
@@ -56,6 +57,7 @@ template <class T, class U>
 
 #if __cpp_lib_type_identity
 using std::type_identity;
+using std::type_identity_t;
 #else
 template <typename T>
 struct type_identity {
