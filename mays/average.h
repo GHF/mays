@@ -16,6 +16,9 @@ namespace mays {
 // when the sum of the inputs overflows integer limits. This function works by summing the halves of
 // the input values and then rounding the sum towards zero.
 //
+// Note that the "round towards zero" behavior makes this different from C++20's std::midpoint,
+// which rounds odd integer sums towards the first argument.
+//
 // Examples:
 //   // (100 + 120) would overflow a int8_t, so |(a + b) / 2| results in undefined behavior
 //   constexpr int8_t kAlpha = Average(int8_t{100}, int8_t{120});  // kAlpha = 110
@@ -42,7 +45,7 @@ template <typename T>
   } else {
     // Use a (maybe) more compiler-friendly form for unsigned integers, where the absolute
     // difference of a and b will always be in range.
-    auto avg_of = [](T x, T y) { return x + (y - x) / 2; };
+    auto avg_of = [](T x, T y) { return static_cast<T>(x + (y - x) / 2); };
     if (a > b) {
       return avg_of(b, a);
     }
