@@ -13,7 +13,8 @@
 #define MAYS_HANDLE_CHECK_FAILURE(condition_string) std::abort()
 #endif  // MAYS_HANDLE_CHECK_FAILURE
 
-#if __has_cpp_attribute(unlikely)
+// GCC 9 emits a warning "attributes at the beginning of statement are ignored"
+#if __has_cpp_attribute(unlikely) && (!defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 10)
 #if defined(__clang__)
 #if __cplusplus < 202002L
 #pragma clang diagnostic ignored "-Wc++20-extensions"
@@ -23,7 +24,7 @@
 #define MAYS_ATTRIBUTE_UNLIKELY [[unlikely]]
 #else
 #define MAYS_ATTRIBUTE_UNLIKELY
-#endif  // __has_cpp_attribute(unlikely)
+#endif  // __has_cpp_attribute(unlikely) && "exclude GCC < 10"
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define MAYS_CHECK(condition)                                                                   \
