@@ -26,8 +26,10 @@ template <typename T, size_t BitWidth>
 template <typename T>
 [[nodiscard]] static constexpr T ReflectBits(T value) {
   static_assert(sizeof(T) <= sizeof(uint64_t));
-#if defined(__has_builtin) && __has_builtin(__builtin_bitreverse8)
-  // Builtins offer significant speedup for ISAs with bit-reverse ops (e.g. ARM's rbit).
+#if defined(__has_builtin) && __has_builtin(__builtin_bitreverse8) && \
+    (!defined(__clang__) || __clang_major__ >= 12)
+  // Builtins offer significant speedup for ISAs with bit-reverse ops (e.g. ARM's rbit). They were
+  // not constexpr-friendly prior to PR47249 (released with Clang 12).
   if constexpr (sizeof(T) == sizeof(int8_t)) {
     return __builtin_bitreverse8(value);
   } else if constexpr (sizeof(T) == sizeof(int16_t)) {
@@ -37,7 +39,7 @@ template <typename T>
   } else {
     return __builtin_bitreverse64(value);
   }
-#else   // defined(__has_builtin) && __has_builtin(__builtin_bitreverse8)
+#else   // defined(__has_builtin) && __has_builtin(__builtin_bitreverse8) && …
   if constexpr (sizeof(T) == sizeof(int8_t)) {
     // Technique from "Bit Twiddling Hacks" (Sean Anderson & Mike Keith, 2001) accessed at
     // http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith32Bits
@@ -67,7 +69,7 @@ template <typename T>
     const uint64_t upper_reflect = ReflectBits(static_cast<uint32_t>(value >> 32));
     return static_cast<T>((lower_reflect << 32) | upper_reflect);
   }
-#endif  // defined(__has_builtin) && __has_builtin(__builtin_bitreverse8)
+#endif  // defined(__has_builtin) && __has_builtin(__builtin_bitreverse8) && …
 }
 
 // Reverses the order of the lowest |BitWidth| bits in the integral argument |value|.
