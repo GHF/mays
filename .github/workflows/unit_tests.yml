@@ -21,7 +21,7 @@ jobs:
           - compiler: Clang
             version: 13
           - compiler: GCC
-            version: 11
+            version: 10
           - std: 17
             test_with_cxx20: OFF
           - std: 20
