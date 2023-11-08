@@ -1,7 +1,5 @@
 name: clang-tidy-push
 on: [push, workflow_dispatch]
-env:
-  CLANG_TIDY_VERSION: 12
 jobs:
   static-analysis:
     name: Static analysis
@@ -11,11 +9,11 @@ jobs:
     - name: Install clang-tidy
       run: |
         sudo apt-get update
-        sudo apt-get install -y clang-tidy-${{env.CLANG_TIDY_VERSION}}
+        sudo apt-get install -y clang clang-tidy
     - name: Prepare compile_commands.json
       run: |
         cmake -B ${{github.workspace}}/build
         ln -s ${{github.workspace}}/build/compile_commands.json ${{github.workspace}}
     - name: Run analysis
       run: |
-        find mays -name '*.cc' -o -name '*.h' | xargs -P0 -I {} clang-tidy-${{env.CLANG_TIDY_VERSION}} {}
+        find mays -name '*.cc' -o -name '*.h' | xargs -P0 -I {} clang-tidy {}
