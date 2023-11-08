@@ -26,7 +26,7 @@ if(TOP_LEVEL_PROJECT)
   FetchContent_Declare(
     Catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG        v2.13.10)
+    GIT_TAG        v3.4.0)
   SET(CATCH_BUILD_STATIC_LIBRARY ON CACHE BOOL "Build Catch2 main")
   FetchContent_MakeAvailable(Catch2)
 
