@@ -28,7 +28,7 @@ jobs:
             test_with_cxx20: ON
           - compiler: Clang
             std: 20
-            version: latest
+            version: 15
             test_with_cxx20: ON
             coverage: ON
 
