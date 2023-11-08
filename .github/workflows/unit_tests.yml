@@ -19,16 +19,16 @@ jobs:
           - coverage: ON
         include:
           - compiler: Clang
-            version: 13
+            version: 15
           - compiler: GCC
-            version: 11
+            version: latest
           - std: 17
             test_with_cxx20: OFF
           - std: 20
             test_with_cxx20: ON
           - compiler: Clang
             std: 20
-            version: 13
+            version: latest
             test_with_cxx20: ON
             coverage: ON
 
