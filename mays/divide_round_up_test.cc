@@ -102,7 +102,7 @@ TEST_CASE("Compute quotients rounded up of large dividends", "[divide_round_up]"
   static_assert(2 == DivideRoundUp(int8_t{-64 - 1}, int8_t{-64}));
 }
 
-TEST_CASE("Compute quotients rounded up of mixed types", "[divide_round_up") {
+TEST_CASE("Compute quotients rounded up of mixed types", "[divide_round_up]") {
   // sizeof as an argument
   static_assert(2U == DivideRoundUp(sizeof(uint64_t), sizeof(uint32_t)));
   static_assert(2U == DivideRoundUp(8U, sizeof(uint32_t)));
