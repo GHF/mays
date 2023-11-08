@@ -1,5 +1,5 @@
 name: clang-tidy-push
-on: push
+on: [push, workflow_dispatch]
 env:
   CLANG_TIDY_VERSION: 12
 jobs:
