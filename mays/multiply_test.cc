@@ -4,6 +4,9 @@
 
 #include "multiply.h"
 
+#include <cstdint>
+#include <optional>
+
 #include <catch2/catch.hpp>
 
 namespace mays {

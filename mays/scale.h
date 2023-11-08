@@ -5,7 +5,6 @@
 #ifndef MAYS_SCALE_H
 #define MAYS_SCALE_H
 
-#include <cstdint>
 #include <limits>
 #include <optional>
 #include <type_traits>
@@ -15,6 +14,7 @@
 #include "internal/check.h"
 #include "multiply.h"
 #include "nabs.h"
+#include "round_policy.h"
 
 namespace mays {
 
@@ -122,13 +122,17 @@ class Scaler final {
     // value remainder * numerator can't overflow. Avoid this check for this unit rate case
     // because it divides by zero.
     if constexpr (std::is_signed_v<In>) {
+      // NOLINTBEGIN(clang-analyzer-core.DivideZero)
       return Nabs(numerator_) >=
              std::numeric_limits<Intermediate>::max() / (Nabs(denominator_) + 1);
+      // NOLINTEND(clang-analyzer-core.DivideZero)
     }
     return numerator_ <= std::numeric_limits<Intermediate>::max() / (denominator_ - 1);
   }
 
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
   const Numerator numerator_;
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
   const Denominator denominator_;
 };
 

@@ -10,7 +10,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "internal/check.h"
 #include "negate_if.h"
 #include "sign_of.h"
 

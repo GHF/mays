@@ -9,6 +9,7 @@
 #include <type_traits>
 
 #include "internal/check.h"
+#include "internal/polyfill.h"
 #include "internal/type_traits.h"
 
 namespace mays {

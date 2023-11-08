@@ -6,6 +6,7 @@
 
 #include <optional>
 #include <string>
+#include <utility>
 
 #include <catch2/catch.hpp>
 
@@ -32,7 +33,7 @@ class CheckFixture {
 using namespace Catch::Matchers;
 
 TEST_CASE_METHOD(CheckFixture, "Check true condition does nothing", "[internal/assert]") {
-  int i = 0;
+  const int i = 0;
   MAYS_CHECK(i == 0);
   MAYS_CHECK(1 == 1);
   CHECK(false == handler_called());
@@ -54,6 +55,7 @@ TEST_CASE_METHOD(CheckFixture, "Check false condition calls custom handler", "[i
 
   CHECK(handler_called());
   REQUIRE(condition().has_value());
+  // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
   CHECK_THAT(*condition(), Equals("1 == 2"));
 }
 

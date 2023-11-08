@@ -18,7 +18,7 @@ TEST_CASE("Conditionally negate integer", "[sign_of]") {
   }
 
   SECTION("Common values") {
-    int i = GENERATE(1, 2, 3, 4);
+    const int i = GENERATE(1, 2, 3, 4);
     CHECK(i == NegateIf(i, false));
     CHECK(-i == NegateIf(i, true));
     CHECK(-i == NegateIf(-i, false));

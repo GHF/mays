@@ -6,16 +6,17 @@
 #define MAYS_RANGE_MAP_H
 
 #include <algorithm>
+#include <initializer_list>
 #include <tuple>
 #include <type_traits>
 
 #include "average.h"
 #include "clamp.h"
 #include "internal/check.h"
-#include "internal/type_traits.h"
 #include "nabs.h"
 #include "negate_if.h"
 #include "reduce.h"
+#include "round_policy.h"
 #include "scale.h"
 #include "subtract.h"
 
@@ -118,6 +119,7 @@ class RangeMap final {
     return {out_reduced, in_reduced};
   }
 
+  // NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
   const In in_lo_;
   const In in_hi_;
   const In deadband_;
@@ -127,6 +129,7 @@ class RangeMap final {
   const Out out_midpoint_;
   const Scaler<In, Intermediate, Intermediate> in_to_out_scaler_;
   const bool requires_out_clamp_;
+  // NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
 };
 
 // Template deduction guides

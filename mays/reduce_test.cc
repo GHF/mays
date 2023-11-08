@@ -4,6 +4,10 @@
 
 #include "reduce.h"
 
+#include <cstdint>
+#include <tuple>
+#include <type_traits>
+
 #include <catch2/catch.hpp>
 
 namespace mays {

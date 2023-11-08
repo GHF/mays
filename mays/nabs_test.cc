@@ -3,6 +3,8 @@
 
 #include "nabs.h"
 
+#include <limits>
+
 #include <catch2/catch.hpp>
 
 namespace mays {

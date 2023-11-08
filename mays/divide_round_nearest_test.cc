@@ -5,6 +5,7 @@
 #include "divide_round_nearest.h"
 
 #include <climits>
+#include <cstdint>
 #include <limits>
 
 #include <catch2/catch.hpp>

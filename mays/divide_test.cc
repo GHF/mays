@@ -4,6 +4,11 @@
 
 #include "divide.h"
 
+#include <cstdint>
+#include <limits>
+
+#include "round_policy.h"
+
 #include <catch2/catch.hpp>
 
 namespace mays {

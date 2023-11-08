@@ -4,6 +4,8 @@
 
 #include "average.h"
 
+#include <cstdint>
+
 #include <catch2/catch.hpp>
 
 namespace mays {

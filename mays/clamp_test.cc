@@ -3,6 +3,10 @@
 
 #include "clamp.h"
 
+#include <cmath>
+#include <cstdint>
+#include <limits>
+
 #include <catch2/catch.hpp>
 
 namespace mays {

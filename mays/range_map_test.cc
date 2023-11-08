@@ -4,6 +4,10 @@
 
 #include "range_map.h"
 
+#include <cstdint>
+
+#include "average.h"
+
 #include <catch2/catch.hpp>
 
 namespace mays {

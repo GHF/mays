@@ -5,9 +5,8 @@
 #ifndef MAYS_INTERNAL_CHECK_H
 #define MAYS_INTERNAL_CHECK_H
 
-#include <type_traits>
-
 #ifndef MAYS_HANDLE_CHECK_FAILURE
+// NOLINTNEXTLINE(misc-include-cleaner)
 #include <cstdlib>
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define MAYS_HANDLE_CHECK_FAILURE(condition_string) std::abort()
@@ -25,6 +24,7 @@
 #define MAYS_ATTRIBUTE_UNLIKELY
 #endif  // __has_cpp_attribute(unlikely)
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-do-while)
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define MAYS_CHECK(condition)                                                                   \
   do {                                                                                          \
@@ -34,5 +34,6 @@
     if (!(condition))                                                                           \
       MAYS_ATTRIBUTE_UNLIKELY { MAYS_HANDLE_CHECK_FAILURE(#condition); }                        \
   } while (false)
+// NOLINTEND(cppcoreguidelines-avoid-do-while)
 
 #endif  // MAYS_INTERNAL_CHECK_H
