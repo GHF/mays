@@ -10,9 +10,9 @@
 #include <tuple>
 #include <utility>
 
-#include "round_policy.h"
-
 #include <catch2/catch.hpp>
+
+#include "round_policy.h"
 
 namespace mays {
 namespace {

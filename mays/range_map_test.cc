@@ -6,9 +6,9 @@
 
 #include <cstdint>
 
-#include "average.h"
-
 #include <catch2/catch.hpp>
+
+#include "average.h"
 
 namespace mays {
 namespace {
