@@ -6,6 +6,7 @@ Checks: >
   -cppcoreguidelines-avoid-c-arrays,
   -cppcoreguidelines-avoid-magic-numbers,
   clang-diagnostic-*,
+  -clang-diagnostic-unknown-pragmas,
   clang-analyzer-*,
   cert-*,
   google-*,
@@ -32,3 +33,5 @@ CheckOptions:
     value:           'true'
   - key:             readability-magic-numbers.IgnorePowersOf2IntegerValues
     value:           'true'
+  - key:             misc-include-cleaner.IgnoreHeaders
+    value:           'catch2/.*'
