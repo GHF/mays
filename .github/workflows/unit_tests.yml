@@ -14,7 +14,7 @@ jobs:
       matrix:
         compiler: [ GCC, Clang ]
         coverage: [ OFF, ON ]
-        std: [17, 20]
+        std: [20, 23]
         exclude:
           - coverage: ON
         include:
@@ -23,7 +23,8 @@ jobs:
           - compiler: GCC
             version: latest
           - compiler: Clang
-            std: 20
+            version: 15
+            std: 23
             coverage: ON
 
     steps:
