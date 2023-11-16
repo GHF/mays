@@ -7,15 +7,19 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Clang
-      uses: egor-tensin/setup-clang@v1
-    - name: Install clang-tidy
+      env:
+        CLANG_VERSION: ${{ vars.CLANG_VERSION }}
       run: |
-        sudo apt-get update
-        sudo apt-get install -y clang-tidy
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x ./llvm.sh
+        sudo ./llvm.sh $CLANG_VERSION all
+        sudo ln -f -s /usr/bin/clang-$CLANG_VERSION /usr/local/bin/cc
+        sudo ln -f -s /usr/bin/clang++-$CLANG_VERSION /usr/local/bin/c++
+        sudo ln -f -s /usr/bin/clang-tidy-$CLANG_VERSION /usr/local/bin/clang-tidy
     - name: Prepare compile_commands.json
       run: |
         cmake -B ${{github.workspace}}/build
         ln -s ${{github.workspace}}/build/compile_commands.json ${{github.workspace}}
     - name: Run analysis
       run: |
-        find mays -name '*.cc' -o -name '*.h' | xargs -P0 -I {} clang-tidy {}
+        find mays -name '*.cc' -o -name '*.h' | xargs -P0 -I {} clang-tidy --extra-arg='-Wno-unknown-pragmas' {}
