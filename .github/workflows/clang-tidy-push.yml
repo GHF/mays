@@ -20,6 +20,11 @@ jobs:
       run: |
         cmake -B ${{github.workspace}}/build
         ln -s ${{github.workspace}}/build/compile_commands.json ${{github.workspace}}
+    - name: Upload compile_commands.json
+      uses: actions/upload-artifact@v3
+      with:
+        name: compile_commands.json
+        path: compile_commands.json
     - name: Run analysis
       run: |
         find mays -name '*.cc' -o -name '*.h' | xargs -P0 -I {} clang-tidy {}
