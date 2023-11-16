@@ -7,7 +7,7 @@ env:
 
 jobs:
   build-test:
-    name: Tests (${{ matrix.compiler }} C++${{ matrix.std }})
+    name: Tests (${{ matrix.compiler }} C++${{ matrix.std }} Coverage-${{ matrix.coverage }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
