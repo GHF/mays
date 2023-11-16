@@ -45,9 +45,9 @@ jobs:
       env:
         CLANG_VERSION: ${{ vars.CLANG_VERSION }}
       run: |
+        sudo ln -f -s /usr/bin/lld-$CLANG_VERSION /usr/local/bin/ld
         sudo ln -f -s /usr/bin/llvm-profdata-$CLANG_VERSION /usr/local/bin/llvm-profdata
         sudo ln -f -s /usr/bin/llvm-cov-$CLANG_VERSION /usr/local/bin/llvm-cov
-        sudo ln -f -s /usr/bin/clang-$CLANG_VERSION /usr/local/bin/ld
 
     - name: Set up GCC
       if: matrix.compiler == 'GCC'
