@@ -34,11 +34,15 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Set up Clang
+      uses: egor-tensin/setup-clang@v1
       env:
         CLANG_VERSION: ${{ vars.CLANG_VERSION }}
+      with:
+        version: ${{ vars.CLANG_VERSION }}
+        cc: 1
       run: |
-        sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-        sudo apt-get install -y clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 liblldb-dev libllvm-ocaml-dev libomp-dev libomp5 lld lldb llvm-dev llvm-runtime llvm python3-clang
+        sudo ln -f -s /usr/bin/llvm-profdata-$CLANG_VERSION /usr/local/bin/llvm-profdata
+        sudo ln -f -s /usr/bin/llvm-cov-$CLANG_VERSION /usr/local/bin/llvm-cov
 
     - name: Set up GCC
       if: matrix.compiler == 'GCC'
