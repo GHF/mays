@@ -40,12 +40,17 @@ jobs:
         version: ${{ vars.CLANG_VERSION }}
         cc: 1
 
-    - name: Link Clang tools
+    - name: Use LLVM linker
       if: matrix.compiler == 'Clang'
+      run: |
+        sudo apt-get install -y lld-${{ vars.CLANG_VERSION }}
+        sudo ln -f -s /usr/bin/lld-$CLANG_VERSION /usr/local/bin/ld
+
+    - name: Link coverage tools
+      if: matrix.compiler == 'Clang' && matrix.coverage == 'ON'
       env:
         CLANG_VERSION: ${{ vars.CLANG_VERSION }}
       run: |
-        sudo ln -f -s /usr/bin/lld-$CLANG_VERSION /usr/local/bin/ld
         sudo ln -f -s /usr/bin/llvm-profdata-$CLANG_VERSION /usr/local/bin/llvm-profdata
         sudo ln -f -s /usr/bin/llvm-cov-$CLANG_VERSION /usr/local/bin/llvm-cov
 
