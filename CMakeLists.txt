@@ -15,8 +15,6 @@ target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 
 # Build unit tests when built standalone
 if(TOP_LEVEL_PROJECT)
-  option(TEST_WITH_CXX23 "Build unit tests under C++23" OFF)
-
   option(CODE_COVERAGE "Enable coverage reporting (Clang only)" OFF)
   if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "(Apple)?Clang")
     set(code_cov_options -fprofile-instr-generate -fcoverage-mapping)
@@ -43,9 +41,6 @@ if(TOP_LEVEL_PROJECT)
       mays
       Catch2::Catch2WithMain
   )
-  if(TEST_WITH_CXX23)
-    target_compile_features(${TEST_NAME} PRIVATE cxx_std_23)
-  endif()
   target_compile_options(${TEST_NAME}
     PRIVATE
       # Lots of warnings that are each fatal
