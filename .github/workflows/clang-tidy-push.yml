@@ -12,7 +12,7 @@ jobs:
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod +x ./llvm.sh
-        sudo ./llvm.sh $CLANG_VERSION
+        sudo ./llvm.sh $CLANG_VERSION all
         sudo ln -f -s /usr/bin/clang-$CLANG_VERSION /usr/local/bin/cc
         sudo ln -f -s /usr/bin/clang++-$CLANG_VERSION /usr/local/bin/c++
         sudo ln -f -s /usr/bin/clang-tidy-$CLANG_VERSION /usr/local/bin/clang-tidy
