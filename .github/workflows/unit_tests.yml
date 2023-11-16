@@ -19,11 +19,9 @@ jobs:
           - coverage: ON
         include:
           - compiler: Clang
-            version: 15
           - compiler: GCC
             version: latest
           - compiler: Clang
-            version: 15
             std: 23
             coverage: ON
 
@@ -32,10 +30,17 @@ jobs:
 
     - name: Set up Clang
       if: matrix.compiler == 'Clang'
-      uses: egor-tensin/setup-clang@v1
-      with:
-        version: ${{ matrix.version }}
-        cc: 1
+      env:
+        CLANG_VERSION: ${{ vars.CLANG_VERSION }}
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x ./llvm.sh
+        sudo ./llvm.sh $CLANG_VERSION all
+        sudo ln -f -s /usr/bin/clang-$CLANG_VERSION /usr/local/bin/cc
+        sudo ln -f -s /usr/bin/clang++-$CLANG_VERSION /usr/local/bin/c++
+        sudo ln -f -s /usr/bin/ld.lld-$CLANG_VERSION /usr/local/bin/ld
+        sudo ln -f -s /usr/bin/llvm-profdata-$CLANG_VERSION /usr/local/bin/llvm-profdata
+        sudo ln -f -s /usr/bin/llvm-cov-$CLANG_VERSION /usr/local/bin/llvm-cov
 
     - name: Set up GCC
       if: matrix.compiler == 'GCC'
@@ -60,8 +65,8 @@ jobs:
       if: matrix.coverage == 'ON'
       working-directory: ${{github.workspace}}/build
       run: |
-        llvm-profdata-${{ matrix.version }} merge -sparse default.profraw -o coverage.profdata
-        llvm-cov-${{ matrix.version }} show ./mays_tests -instr-profile=coverage.profdata > coverage.txt
+        llvm-profdata merge -sparse default.profraw -o coverage.profdata
+        llvm-cov show ./mays_tests -instr-profile=coverage.profdata > coverage.txt
 
     - name: Upload coverage data to Codecov
       uses: codecov/codecov-action@v2
