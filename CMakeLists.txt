@@ -46,6 +46,13 @@ if(TOP_LEVEL_PROJECT)
   if(TEST_WITH_CXX23)
     target_compile_features(${TEST_NAME} PRIVATE cxx_std_23)
   endif()
+  target_compile_definitions(${TEST_NAME}
+    PRIVATE
+      $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:LLVM_ENABLE_RUNTIMES=libunwind>
+      $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:LIBCXX_USE_COMPILER_RT=YES>
+      $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:LIBCXXABI_USE_COMPILER_RT=YES>
+      $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:LIBUNWIND_USE_COMPILER_RT=YES>
+  )
   target_compile_options(${TEST_NAME}
     PRIVATE
       # Lots of warnings that are each fatal
@@ -57,6 +64,8 @@ if(TOP_LEVEL_PROJECT)
   )
   target_link_options(${TEST_NAME}
     PRIVATE
+      $<$<OR:$<LINK_LANG_AND_ID:CXX,Clang>,$<LINK_LANG_AND_ID:CXX,AppleClang>>:-stdlib=libc++>
+      $<$<OR:$<LINK_LANG_AND_ID:CXX,Clang>,$<LINK_LANG_AND_ID:CXX,AppleClang>>:-rtlib=compiler-rt>
       ${code_cov_options}
   )
 
