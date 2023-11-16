@@ -34,8 +34,11 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Set up Clang
+      env:
+        CLANG_VERSION: ${{ vars.CLANG_VERSION }}
       run: |
         sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+        sudo apt install clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 liblldb-dev libllvm-ocaml-dev libomp-dev libomp5 lld lldb llvm-dev llvm-runtime llvm python3-clang
 
     - name: Set up GCC
       if: matrix.compiler == 'GCC'
@@ -60,8 +63,8 @@ jobs:
       if: matrix.coverage == 'ON'
       working-directory: ${{github.workspace}}/build
       run: |
-        llvm-profdata-${{ matrix.version }} merge -sparse default.profraw -o coverage.profdata
-        llvm-cov-${{ matrix.version }} show ./mays_tests -instr-profile=coverage.profdata > coverage.txt
+        llvm-profdata merge -sparse default.profraw -o coverage.profdata
+        llvm-cov show ./mays_tests -instr-profile=coverage.profdata > coverage.txt
 
     - name: Upload coverage data to Codecov
       uses: codecov/codecov-action@v2

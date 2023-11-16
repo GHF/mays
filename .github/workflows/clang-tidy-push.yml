@@ -15,6 +15,7 @@ jobs:
         sudo ./llvm.sh $CLANG_VERSION
         sudo ln -f -s /usr/bin/clang-$CLANG_VERSION /usr/local/bin/cc
         sudo ln -f -s /usr/bin/clang++-$CLANG_VERSION /usr/local/bin/c++
+        sudo ln -f -s /usr/bin/clang-tidy-$CLANG_VERSION /usr/local/bin/clang-tidy
     - name: Prepare compile_commands.json
       run: |
         cmake -B ${{github.workspace}}/build
