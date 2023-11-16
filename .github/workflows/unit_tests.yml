@@ -22,14 +22,8 @@ jobs:
             version: 15
           - compiler: GCC
             version: latest
-          - std: 17
-            test_with_cxx20: OFF
-          - std: 20
-            test_with_cxx20: ON
           - compiler: Clang
             std: 20
-            version: 15
-            test_with_cxx20: ON
             coverage: ON
 
     steps:
@@ -50,7 +44,7 @@ jobs:
         cc: 1
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCODE_COVERAGE=${{ matrix.coverage }} -DTEST_WITH_CXX20=${{ matrix.test_with_cxx20 }}
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCODE_COVERAGE=${{ matrix.coverage }} -DCMAKE_CXX_STANDARD=${{ matrix.std }}
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --parallel --config ${{env.BUILD_TYPE}}
