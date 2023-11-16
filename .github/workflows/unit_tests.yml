@@ -57,6 +57,12 @@ jobs:
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCODE_COVERAGE=${{ matrix.coverage }} -DTEST_WITH_CXX23=${{ matrix.test_with_cxx23 }}
 
+    - name: Upload compile_commands.json
+      uses: actions/upload-artifact@v3
+      with:
+        name: compile_commands.json
+        path: compile_commands.json
+
     - name: Build
       run: cmake --build ${{github.workspace}}/build --parallel --config ${{env.BUILD_TYPE}}
 

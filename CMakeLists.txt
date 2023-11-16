@@ -36,7 +36,8 @@ if(TOP_LEVEL_PROJECT)
   list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/contrib)
 
   if(CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(Catch2 PRIVATE -stdlib=libc++)
+    target_compile_options(Catch2::Catch2 PUBLIC -stdlib=libc++)
+    target_compile_options(Catch2::Catch2WithMain PUBLIC -stdlib=libc++)
   endif()
 
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
