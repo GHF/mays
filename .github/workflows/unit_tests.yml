@@ -38,7 +38,7 @@ jobs:
         CLANG_VERSION: ${{ vars.CLANG_VERSION }}
       run: |
         sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-        sudo apt install clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 liblldb-dev libllvm-ocaml-dev libomp-dev libomp5 lld lldb llvm-dev llvm-runtime llvm python3-clang
+        sudo apt-get install -y clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 liblldb-dev libllvm-ocaml-dev libomp-dev libomp5 lld lldb llvm-dev llvm-runtime llvm python3-clang
 
     - name: Set up GCC
       if: matrix.compiler == 'GCC'
