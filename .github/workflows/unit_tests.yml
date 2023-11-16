@@ -19,7 +19,7 @@ jobs:
           - coverage: ON
         include:
           - compiler: Clang
-            version: 15
+            version: 17
           - compiler: GCC
             version: latest
           - std: 20
@@ -28,7 +28,7 @@ jobs:
             test_with_cxx23: ON
           - compiler: Clang
             std: 23
-            version: 15
+            version: 17
             test_with_cxx23: ON
             coverage: ON
 
