@@ -18,8 +18,8 @@ jobs:
         sudo ln -f -s /usr/bin/clang-tidy-$CLANG_VERSION /usr/local/bin/clang-tidy
     - name: Prepare compile_commands.json
       run: |
-        cmake -B ${{github.workspace}}/build -DCMAKE_CXX_FLAGS=-stdlib=libc++
+        cmake -B ${{github.workspace}}/build
         ln -s ${{github.workspace}}/build/compile_commands.json ${{github.workspace}}
     - name: Run analysis
       run: |
-        find mays -name '*.cc' -o -name '*.h' | xargs -P0 -I {} clang-tidy {}
+        find mays -name '*.cc' -o -name '*.h' | xargs -P0 -I {} clang-tidy --extra-arg='-stdlib=libc++ -Wno-unknown-pragmas' {}
