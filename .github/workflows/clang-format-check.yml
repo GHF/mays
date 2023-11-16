@@ -9,4 +9,5 @@ jobs:
     - name: Run clang-format style check for C/C++ programs.
       uses: jidicula/clang-format-action@main
       with:
+        clang-format-version: ${{ vars.CLANG_VERSION }}
         check-path: 'mays'
