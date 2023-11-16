@@ -60,6 +60,7 @@ if(TOP_LEVEL_PROJECT)
       # Force color diagnostics output
       $<$<CXX_COMPILER_ID:GNU>:-fdiagnostics-color=always>
       $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-fcolor-diagnostics>
+      $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-stdlib=libc++>
       ${code_cov_options}
   )
   target_link_options(${TEST_NAME}
