@@ -37,10 +37,12 @@ jobs:
 
     - name: Set up Clang
       if: matrix.compiler == 'Clang'
-      uses: egor-tensin/setup-clang@v1
-      with:
-        version: ${{ matrix.version }}
-        cc: 1
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x ./llvm.sh
+        sudo ./llvm.sh ${{ matrix.version }}
+        sudo ln -f -s /usr/bin/clang-${{ matrix.version }} /usr/local/bin/cc
+        sudo ln -f -s /usr/bin/clang++-${{ matrix.version }} /usr/local/bin/c++
 
     - name: Set up GCC
       if: matrix.compiler == 'GCC'
