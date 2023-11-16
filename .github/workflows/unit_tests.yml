@@ -61,7 +61,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: compile_commands.json
-        path: ${{github.workspace}}/compile_commands.json
+        path: ${{github.workspace}}/build/compile_commands.json
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --parallel --config ${{env.BUILD_TYPE}}
