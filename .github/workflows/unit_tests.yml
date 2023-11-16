@@ -19,7 +19,6 @@ jobs:
           - coverage: ON
         include:
           - compiler: Clang
-            version: 17
           - compiler: GCC
             version: latest
           - std: 20
@@ -28,7 +27,6 @@ jobs:
             test_with_cxx23: ON
           - compiler: Clang
             std: 23
-            version: 17
             test_with_cxx23: ON
             coverage: ON
 
@@ -36,13 +34,8 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Set up Clang
-      if: matrix.compiler == 'Clang'
       run: |
-        wget https://apt.llvm.org/llvm.sh
-        chmod +x ./llvm.sh
-        sudo ./llvm.sh ${{ matrix.version }}
-        sudo ln -f -s /usr/bin/clang-${{ matrix.version }} /usr/local/bin/cc
-        sudo ln -f -s /usr/bin/clang++-${{ matrix.version }} /usr/local/bin/c++
+        bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
 
     - name: Set up GCC
       if: matrix.compiler == 'GCC'
