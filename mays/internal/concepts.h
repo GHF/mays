@@ -6,6 +6,7 @@
 
 #include <concepts>
 #include <type_traits>
+#include <utility>
 
 namespace mays::internal {
 
@@ -20,8 +21,7 @@ concept is_convertible_without_narrowing = std::convertible_to<From, To> && requ
 
 // True if T sign-extends when right-shifted (two's complement representation is assumed).
 template <class T>
-concept has_arithmetic_shift =
-    std::is_integral_v<T> && std::bool_constant<(T{-1} >> 1) == T{-1}>::value;
+concept has_arithmetic_shift = std::integral<T> && std::bool_constant<(T{-1} >> 1) == T{-1}>::value;
 
 }  // namespace mays::internal
 

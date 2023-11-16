@@ -67,6 +67,7 @@
         "vector": "cpp",
         "algorithm": "cpp",
         "concepts": "cpp",
-        "span": "cpp"
+        "span": "cpp",
+        "type_traits": "cpp"
     }
 }
