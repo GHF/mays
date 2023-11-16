@@ -7,7 +7,7 @@
 
 #include <type_traits>
 
-#include "internal/type_traits.h"
+#include "internal/concepts.h"
 
 namespace mays {
 
@@ -31,7 +31,7 @@ template <typename T>
 [[nodiscard]] constexpr T Average(T a, T b) {
   static_assert(std::is_integral_v<T>, "Valid only for integers");
   if constexpr (std::is_signed_v<T>) {
-    static_assert(::mays::internal::has_arithmetic_shift_v<T>,
+    static_assert(::mays::internal::has_arithmetic_shift<T>,
                   "Arithmetic right shift not available");
     // Shifts divide by two, rounded towards negative infinity.
     const T sum_halves = (a >> 1) + (b >> 1);

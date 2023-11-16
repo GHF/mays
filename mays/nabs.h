@@ -6,7 +6,7 @@
 
 #include <type_traits>
 
-#include "internal/type_traits.h"
+#include "internal/concepts.h"
 
 namespace mays {
 
@@ -18,7 +18,7 @@ template <typename T>
 [[nodiscard]] constexpr T Nabs(T i) {
   static_assert(std::is_integral_v<T> && std::is_signed_v<T>, "Valid only for signed integers");
   // Check if signed right shift sign extends (i.e. arithmetic right shift).
-  if constexpr (::mays::internal::has_arithmetic_shift_v<T>) {
+  if constexpr (::mays::internal::has_arithmetic_shift<T>) {
     constexpr int num_bits = sizeof(T) * 8;
     // Splat sign bit into all bit positions. |sign| takes a value of either 0 or -1.
     const T sign = i >> (num_bits - 1);

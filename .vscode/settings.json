@@ -65,6 +65,8 @@
         "unordered_map": "cpp",
         "variant": "cpp",
         "vector": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "concepts": "cpp",
+        "span": "cpp"
     }
 }

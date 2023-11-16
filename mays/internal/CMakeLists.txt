@@ -1,8 +1,7 @@
 target_sources(${PROJECT_NAME}
   INTERFACE
     check.h
-    polyfill.h
-    type_traits.h
+    concepts.h
 )
 
 target_sources(${PROJECT_NAME}_tests

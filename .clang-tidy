@@ -34,4 +34,4 @@ CheckOptions:
   - key:             readability-magic-numbers.IgnorePowersOf2IntegerValues
     value:           'true'
   - key:             misc-include-cleaner.IgnoreHeaders
-    value:           'catch2/.*'
+    value:           'catch2/.*;concepts(\.h)?'  # TODO: remove when misc-include-cleaner understands concepts (clang-tidy 17 does not)
