@@ -44,7 +44,7 @@ jobs:
       if: matrix.compiler == 'Clang'
       run: |
         sudo apt-get install -y lld-${{ vars.CLANG_VERSION }}
-        sudo ln -f -s /usr/bin/lld-$CLANG_VERSION /usr/local/bin/ld
+        sudo ln -f -s /usr/bin/ld.lld-$CLANG_VERSION /usr/local/bin/ld
 
     - name: Link coverage tools
       if: matrix.compiler == 'Clang' && matrix.coverage == 'ON'
